@@ -6,12 +6,24 @@
     <title>PhimCa — Cast local media to your TV, projector &amp; hi-fi</title>
     <meta name="description" content="PhimCa bridges local-network media (SMB/CIFS shares) to DLNA renderers and local playback. Browse NAS/PC shares, cast to a TV, projector or audio receiver, or play on your phone — bit-perfect, LAN-only, no account.">
     <meta name="theme-color" content="#050505">
+    <link rel="canonical" href="https://phimca.com/">
+
+    <!-- Favicon / app icon -->
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
 
     <!-- Open Graph -->
     <meta property="og:title" content="PhimCa — Cast local media to your TV, projector & hi-fi">
     <meta property="og:description" content="Bridge SMB/NAS media to DLNA renderers and local playback. Bit-perfect audio, DSD/hi-res, subtitles — LAN-only, no account.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://vietace.github.io/">
+    <meta property="og:url" content="https://phimca.com/">
+    <meta property="og:image" content="https://phimca.com/og-image.png">
+    <meta property="og:image:width" content="1024">
+    <meta property="og:image:height" content="500">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="PhimCa — Cast local media to your TV, projector & hi-fi">
+    <meta name="twitter:description" content="Bridge SMB/NAS media to DLNA renderers and local playback. Bit-perfect audio, DSD/hi-res, subtitles — LAN-only, no account.">
+    <meta name="twitter:image" content="https://phimca.com/og-image.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -92,12 +104,10 @@
         .brand { display: flex; align-items: center; gap: 12px; }
         .brand .mark {
             width: 38px; height: 38px; border-radius: 11px;
-            display: flex; align-items: center; justify-content: center;
-            background: var(--gold-pill);
-            border: 1px solid rgba(255, 226, 130, 0.85);
-            box-shadow: 0 6px 18px rgba(255, 171, 0, 0.35), inset 0 1px 0 rgba(255, 246, 210, 0.85);
+            display: block; object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
         }
-        .brand .mark svg { width: 22px; height: 22px; fill: #3a2a00; }
         .brand .name { font-size: 19px; font-weight: 800; letter-spacing: -0.02em; }
 
         /* ===================== glass button primitives ===================== */
@@ -363,9 +373,7 @@
     <!-- top bar -->
     <header class="topbar">
         <div class="brand">
-            <div class="mark">
-                <svg viewBox="0 0 24 24"><path d="M1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.93-11-11-11zm20-7H3c-1.1 0-2 .9-2 2v3h2V5h18v14h-7v2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 12l2 2 4-4-6-6v8z"/></svg>
-            </div>
+            <img class="mark" src="logo.png" alt="PhimCa app icon" width="38" height="38">
             <span class="name">PhimCa</span>
         </div>
         <a href="https://play.google.com/store/apps/details?id=com.phimca.app" class="btn btn-glass" target="_blank" rel="noopener">Get the app</a>
@@ -553,9 +561,7 @@
     <footer>
         <div class="wrap foot-inner">
             <div class="brand">
-                <div class="mark">
-                    <svg viewBox="0 0 24 24"><path d="M1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.93-11-11-11zm20-7H3c-1.1 0-2 .9-2 2v3h2V5h18v14h-7v2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 12l2 2 4-4-6-6v8z"/></svg>
-                </div>
+                <img class="mark" src="logo.png" alt="PhimCa app icon" width="38" height="38">
                 <span class="name">PhimCa</span>
             </div>
             <div class="foot-links">
