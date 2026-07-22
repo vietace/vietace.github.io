@@ -572,11 +572,24 @@
             <div class="foot-links">
                 <a href="https://vietace.github.io/phimca-privacy/" target="_blank" rel="noopener">Privacy Policy</a>
                 <a href="https://play.google.com/store/apps/details?id=com.phimca.app" target="_blank" rel="noopener">Google Play</a>
-                <a href="mailto:epicmediadev@gmail.com">epicmediadev@gmail.com</a>
+                <a class="js-email" href="#contact">Contact support</a>
             </div>
         </div>
-        <div class="wrap"><p class="foot-meta">© 2026 PhimCa · com.phimca.app · Cast NAS, PC &amp; cloud media to DLNA &middot; Support: <a href="mailto:epicmediadev@gmail.com" style="color:inherit">epicmediadev@gmail.com</a></p></div>
+        <div class="wrap"><p class="foot-meta">© 2026 PhimCa · com.phimca.app · Cast NAS, PC &amp; cloud media to DLNA &middot; Support: <a class="js-email" href="#contact" style="color:inherit">contact us</a></p></div>
     </footer>
+
+    <!-- Assemble the support address at runtime so it never appears as plaintext
+         in the static HTML (email-harvesting bots don't run JS). Humans still
+         see it and can click / copy it. -->
+    <script>
+      (function () {
+        var user = 'epicmediadev', domain = 'gmail.com', addr = user + '@' + domain;
+        document.querySelectorAll('a.js-email').forEach(function (a) {
+          a.setAttribute('href', 'mailto:' + addr);
+          a.textContent = addr;
+        });
+      })();
+    </script>
 
 </body>
 </html>
