@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Getting PhimCa — opening Google Play</title>
+    <meta name="description" content="Download PhimCa from Google Play — cast your NAS, SMB shares and cloud drives to your TV, projector or hi-fi.">
+    <meta name="theme-color" content="#050505">
+
+    <!-- This page exists to forward people to the Play Store. It must never compete
+         with https://phimca.com/ in search results, so it is deliberately noindex.
+         "follow" still lets the links out of here be crawled. -->
+    <meta name="robots" content="noindex, follow">
+
+    <!-- Warm the connection while the splash is on screen so the hop feels instant. -->
+    <link rel="preconnect" href="https://play.google.com">
+    <link rel="dns-prefetch" href="https://play.google.com">
+
+    <link rel="icon" type="image/png" href="../logo.png">
+    <link rel="apple-touch-icon" href="../logo.png">
+
+    <!-- Shares of this URL should preview (and consolidate) as the homepage. -->
+    <meta property="og:title" content="PhimCa — Cast local media to your TV, projector &amp; hi-fi">
+    <meta property="og:description" content="Bridge SMB/NAS and cloud media to DLNA renderers and local playback. Bit-perfect audio, DSD/hi-res, subtitles.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://phimca.com/">
+    <meta property="og:image" content="https://phimca.com/og-image.png">
+    <meta property="og:image:width" content="1024">
+    <meta property="og:image:height" content="500">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="PhimCa — Cast local media to your TV, projector &amp; hi-fi">
+    <meta name="twitter:description" content="Bridge SMB/NAS and cloud media to DLNA renderers and local playback. Bit-perfect audio, DSD/hi-res, subtitles.">
+    <meta name="twitter:image" content="https://phimca.com/og-image.png">
+
+    <!-- Scripting off: no countdown can run, so fall back to a plain timed refresh.
+         Only valid inside <head>, which is why it sits up here rather than by the
+         button it stands in for. -->
+    <noscript><meta http-equiv="refresh" content="2;url=https://play.google.com/store/apps/details?id=com.phimca.app"></noscript>
+
+    <!-- No webfont on purpose: this page is on screen for ~1.6s, so a font swap
+         would land mid-redirect and look broken. System stack renders instantly. -->
+    <style>
+        :root {
+            --canvas: #060608;
+            --gold: #FFD34D;
+            --txt: #F7F7F7;
+            --txt2: rgba(255, 255, 255, 0.60);
+            --txt3: rgba(255, 255, 255, 0.42);
+            --glass-fill: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06));
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+            --gold-pill: linear-gradient(180deg, #FFDF77 0%, #F7C339 55%, #EBAD18 100%);
+            --dwell: 1600ms;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+            font-feature-settings: "cv05" 1, "cv11" 1;
+            background: var(--canvas);
+            color: var(--txt);
+            min-height: 100vh;
+            min-height: 100svh;
+            line-height: 1.5;
+            overflow-x: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 28px 22px;
+        }
+
+        /* Same ambient palette as the homepage, so the brand reads instantly. */
+        .ambient {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background:
+                radial-gradient(48% 30% at 100% -4%, rgba(45, 90, 190, 0.34), transparent 68%),
+                radial-gradient(38% 26% at 8% 6%,   rgba(255, 190, 20, 0.30), transparent 64%),
+                radial-gradient(40% 34% at 96% 60%, rgba(130, 90, 220, 0.20), transparent 72%),
+                radial-gradient(50% 30% at 24% 108%, rgba(255, 185, 20, 0.24), transparent 66%);
+        }
+        .grain {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.5;
+            background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
+            background-size: 3px 3px;
+        }
+
+        .card {
+            position: relative; z-index: 1;
+            width: 100%; max-width: 430px;
+            text-align: center;
+            padding: 40px 30px 30px;
+            border-radius: 28px;
+            background: var(--glass-fill);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-inset), 0 22px 50px rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            animation: rise 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+        }
+        @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+        .mark {
+            width: 78px; height: 78px; border-radius: 22px;
+            display: block; margin: 0 auto 20px; object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 44px 2px rgba(255, 190, 0, 0.22);
+        }
+
+        .name { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; }
+        .tag { font-size: 14.5px; color: var(--txt2); margin-top: 8px; }
+
+        .status {
+            display: inline-flex; align-items: center; gap: 9px;
+            margin-top: 24px; font-size: 13px; color: var(--txt3);
+        }
+        .status .dot {
+            width: 7px; height: 7px; border-radius: 50%; background: var(--gold);
+            box-shadow: 0 0 10px 1px rgba(255, 190, 0, 0.7);
+            animation: pulse 1.1s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+        .track {
+            height: 3px; margin: 14px auto 0; max-width: 260px;
+            border-radius: 100px; overflow: hidden;
+            background: rgba(255, 255, 255, 0.10);
+        }
+        .track .bar {
+            height: 100%; width: 100%; border-radius: 100px;
+            background: linear-gradient(90deg, #FFE9A8, #FFAB00);
+            transform-origin: left center; transform: scaleX(0);
+            animation: fill var(--dwell) linear both;
+        }
+        @keyframes fill { to { transform: scaleX(1); } }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 11px;
+            font-family: inherit; font-size: 15px; font-weight: 600; letter-spacing: -0.01em;
+            text-decoration: none; cursor: pointer; border: none;
+            padding: 13px 24px; border-radius: 100px;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s;
+        }
+        .btn-gold {
+            color: #4a3600;
+            background: var(--gold-pill);
+            border: 1px solid rgba(255, 226, 130, 0.85);
+            box-shadow: 0 0 30px 4px rgba(255, 190, 0, 0.28), 0 8px 22px rgba(255, 171, 0, 0.26),
+                        inset 0 1px 0 rgba(255, 246, 210, 0.85);
+            margin-top: 26px;
+        }
+        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 0 40px 8px rgba(255,190,0,0.40), 0 12px 30px rgba(255,171,0,0.36), inset 0 1px 0 rgba(255,246,210,0.9); }
+        .btn-gold svg { width: 22px; height: 22px; flex: none; }
+        .pb-txt { text-align: left; line-height: 1.1; }
+        .pb-txt small { display: block; font-size: 10px; font-weight: 600; opacity: 0.72; letter-spacing: 0.04em; text-transform: uppercase; }
+        .pb-txt strong { display: block; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+
+        .escape {
+            display: block; margin-top: 18px;
+            font-size: 13px; color: var(--txt3); text-decoration: none;
+            border-bottom: 1px solid transparent; width: fit-content; margin-inline: auto;
+        }
+        .escape:hover { color: var(--txt2); border-bottom-color: rgba(255,255,255,0.25); }
+
+        /* Drop the animation, keep the forward. A redirect is navigation, not motion,
+           and it stays cancellable via the link below the button — so honouring this
+           by refusing to forward would just strand the large share of phone users who
+           leave "reduce motion" switched on. */
+        @media (prefers-reduced-motion: reduce) {
+            .card, .status .dot, .track .bar { animation: none; }
+            .track .bar { transform: scaleX(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient"></div>
+    <div class="grain"></div>
+
+    <main class="card">
+        <img class="mark" src="../logo.png" alt="PhimCa app icon" width="78" height="78">
+        <h1 class="name">PhimCa</h1>
+        <p class="tag">Cast your NAS, SMB shares and cloud drives to your TV, projector or hi-fi.</p>
+
+        <p class="status" id="status"><span class="dot"></span> <span id="statusText">Opening Google Play…</span></p>
+        <div class="track"><div class="bar"></div></div>
+
+        <a id="playLink" class="btn btn-gold" href="https://play.google.com/store/apps/details?id=com.phimca.app" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="#3a2a00" aria-hidden="true"><path d="M3.6 2.3c-.3.3-.5.7-.5 1.3v16.8c0 .6.2 1 .5 1.3l.1.1L13 12.1v-.2L3.7 2.2l-.1.1z"/><path d="M16.3 15.4l-3.3-3.3v-.2l3.3-3.3.1.1 3.9 2.2c1.1.6 1.1 1.7 0 2.4l-4 2.1z"/><path d="M16.4 15.3L13 12 3.6 21.7c.4.4 1 .4 1.7 0l11.1-6.4z"/><path d="M16.4 8.7L5.3 2.3c-.7-.4-1.3-.4-1.7 0L13 12l3.4-3.3z"/></svg>
+            <span class="pb-txt"><small>Get it on</small><strong>Google Play</strong></span>
+        </a>
+
+        <a class="escape" id="escape" href="/">Or look around phimca.com first</a>
+    </main>
+
+    <script>
+    (function () {
+        var PLAY = 'https://play.google.com/store/apps/details?id=com.phimca.app';
+        var DWELL_MS = 1600;
+
+        // Attribution: Play forwards `referrer` to the Install Referrer API, and Play
+        // Console reports on the utm_* pairs inside it. `?s=` lets one short link tell
+        // its sources apart — /get?s=qr, /get?s=youtube — defaulting to plain "web".
+        var source = (new URLSearchParams(location.search).get('s') || 'web')
+                        .replace(/[^a-z0-9_-]/gi, '').slice(0, 32) || 'web';
+        var referrer = 'utm_source=phimca.com&utm_medium=' + source + '&utm_campaign=get';
+        var target = PLAY + '&referrer=' + encodeURIComponent(referrer);
+
+        var link = document.getElementById('playLink');
+        link.href = target;
+
+        var timer = null;
+        function cancel() {
+            if (timer !== null) { clearTimeout(timer); timer = null; }
+            document.getElementById('statusText').textContent = 'Tap the button when you’re ready.';
+            document.querySelector('.track').style.display = 'none';
+        }
+
+        // Anyone who chooses to stay gets to stay.
+        document.getElementById('escape').addEventListener('click', cancel);
+        // Arm only while the tab is actually in front, and stand down for good the
+        // moment it isn't. That covers both directions of the same surprise: a link
+        // opened into a background tab must not silently navigate itself, and a tab
+        // the reader has left must not yank them away when they come back to it.
+        document.addEventListener('visibilitychange', function () {
+            if (document.hidden) cancel();
+        });
+
+        if (document.visibilityState === 'visible') {
+            // replace(), not assign(): Back from the Play Store must land on whatever
+            // came before /get, otherwise Back re-runs the redirect and traps the user.
+            timer = setTimeout(function () { location.replace(target); }, DWELL_MS);
+        } else {
+            cancel();
+        }
+    })();
+    </script>
+</body>
+</html>
