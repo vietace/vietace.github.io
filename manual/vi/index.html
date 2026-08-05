@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Hướng dẫn Sử dụng PhimCa — truyền phim nhạc từ NAS lên TV</title>
+    <meta name="description" content="Hướng dẫn sử dụng PhimCa đầy đủ: kết nối NAS và ổ chia sẻ SMB, truyền lên TV DLNA và dàn hi-fi, âm thanh bit-perfect và DSD, phụ đề, phản chiếu màn hình và khắc phục sự cố.">
+    <meta name="theme-color" content="#050505">
+    <link rel="canonical" href="https://phimca.com/manual/vi/">
+
+    <link rel="alternate" hreflang="en" href="https://phimca.com/manual/">
+    <link rel="alternate" hreflang="vi" href="https://phimca.com/manual/vi/">
+    <link rel="alternate" hreflang="x-default" href="https://phimca.com/manual/">
+
+    <link rel="icon" type="image/png" href="../../logo.png">
+    <link rel="apple-touch-icon" href="../../logo.png">
+
+    <meta property="og:title" content="Hướng dẫn Sử dụng PhimCa">
+    <meta property="og:description" content="Kết nối NAS và ổ chia sẻ SMB, truyền lên TV DLNA và dàn hi-fi, âm thanh bit-perfect và DSD, phụ đề, phản chiếu màn hình.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://phimca.com/manual/vi/">
+    <meta property="og:image" content="https://phimca.com/og-image.png">
+    <meta property="og:image:width" content="1024">
+    <meta property="og:image:height" content="500">
+    <meta property="og:locale" content="vi_VN">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Hướng dẫn Sử dụng PhimCa">
+    <meta name="twitter:description" content="Kết nối NAS và ổ chia sẻ SMB, truyền lên TV DLNA và dàn hi-fi, âm thanh bit-perfect và DSD, phụ đề, phản chiếu màn hình.">
+    <meta name="twitter:image" content="https://phimca.com/og-image.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --canvas: #060608;
+            --gold: #FFD34D;
+            --gold-strong: #FFC000;
+            --gold-deep: #FFAB00;
+            --txt: #F7F7F7;
+            --txt2: rgba(255, 255, 255, 0.60);
+            --txt3: rgba(255, 255, 255, 0.42);
+
+            /* App glass recipe (from ui/theme/Glass.kt + MediaBridgeTheme.kt) */
+            --glass-fill: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06));
+            --glass-soft: linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.03));
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --glass-hair: rgba(255, 255, 255, 0.09);
+            --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+            --glass-shadow: 0 22px 50px rgba(0, 0, 0, 0.45);
+            --gold-pill: linear-gradient(180deg, #FFDF77 0%, #F7C339 55%, #EBAD18 100%);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+            font-feature-settings: "cv05" 1, "cv11" 1;
+            background: var(--canvas);
+            color: var(--txt);
+            min-height: 100vh;
+            line-height: 1.66;
+            overflow-x: hidden;
+        }
+
+        .ambient {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background:
+                radial-gradient(48% 30% at 100% -4%, rgba(45, 90, 190, 0.34), transparent 68%),
+                radial-gradient(38% 26% at 8% 6%,   rgba(255, 190, 20, 0.30), transparent 64%),
+                radial-gradient(40% 34% at 96% 60%, rgba(130, 90, 220, 0.20), transparent 72%),
+                radial-gradient(50% 30% at 24% 108%, rgba(255, 185, 20, 0.24), transparent 66%);
+        }
+        .grain {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.5;
+            background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
+            background-size: 3px 3px;
+        }
+
+        .wrap { position: relative; z-index: 1; width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 22px; }
+
+        /* ===================== top bar ===================== */
+        .topbar {
+            position: sticky; top: 0; z-index: 40;
+            display: flex; align-items: center; justify-content: space-between; gap: 14px;
+            padding: 12px 22px;
+            background: rgba(8, 8, 11, 0.72);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        .brand { display: inline-flex; align-items: center; gap: 11px; text-decoration: none; color: inherit; }
+        .brand .mark { width: 36px; height: 36px; border-radius: 11px; object-fit: cover; border: 1px solid rgba(255,255,255,0.14); }
+        .brand .name { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
+        .bar-right { display: flex; align-items: center; gap: 10px; }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            font-family: inherit; font-size: 14px; font-weight: 600; letter-spacing: -0.01em;
+            text-decoration: none; cursor: pointer; white-space: nowrap;
+            padding: 9px 17px; border-radius: 100px;
+            transition: transform 0.22s cubic-bezier(0.4,0,0.2,1), box-shadow 0.22s, background 0.22s;
+        }
+        .btn-glass {
+            color: var(--txt);
+            background: var(--glass-fill);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-inset);
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+        }
+        .btn-glass:hover { transform: translateY(-1px); background: linear-gradient(180deg, rgba(255,255,255,0.19), rgba(255,255,255,0.09)); }
+        .btn-gold {
+            color: #4a3600;
+            background: var(--gold-pill);
+            border: 1px solid rgba(255, 226, 130, 0.85);
+            box-shadow: 0 0 26px 3px rgba(255,190,0,0.24), inset 0 1px 0 rgba(255,246,210,0.85);
+        }
+        .btn-gold:hover { transform: translateY(-1px); box-shadow: 0 0 36px 7px rgba(255,190,0,0.36), inset 0 1px 0 rgba(255,246,210,0.9); }
+
+        .langsw { display: inline-flex; padding: 3px; gap: 2px; border-radius: 100px; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-hair); }
+        .langsw a {
+            font-size: 12.5px; font-weight: 700; letter-spacing: 0.02em; text-decoration: none;
+            color: var(--txt3); padding: 5px 12px; border-radius: 100px; transition: color .2s, background .2s;
+        }
+        .langsw a:hover { color: var(--txt); }
+        .langsw a[aria-current="true"] { color: #4a3600; background: var(--gold-pill); box-shadow: inset 0 1px 0 rgba(255,246,210,0.7); }
+
+        /* ===================== hero ===================== */
+        .hero { padding: 54px 0 30px; }
+        .eyebrow {
+            display: inline-flex; align-items: center; gap: 9px;
+            font-size: 12.5px; font-weight: 600; letter-spacing: 0.02em; color: var(--txt2);
+            padding: 7px 15px; border-radius: 100px;
+            background: var(--glass-soft); border: 1px solid var(--glass-hair);
+        }
+        .eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 10px 1px rgba(255,190,0,0.7); }
+        .hero h1 { font-size: clamp(32px, 5.6vw, 52px); font-weight: 900; letter-spacing: -0.035em; line-height: 1.1; margin-top: 20px; }
+        .hero h1 .grad {
+            background: linear-gradient(96deg, var(--gold) 0%, var(--gold-deep) 62%, #FF8A3D 100%);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .hero .lead { font-size: 16.5px; color: var(--txt2); max-width: 64ch; margin-top: 16px; }
+
+        /* ===================== layout ===================== */
+        .layout { display: grid; grid-template-columns: 262px minmax(0, 1fr); gap: 40px; align-items: start; padding-bottom: 30px; }
+
+        .toc { position: sticky; top: 84px; }
+        .toc-inner {
+            padding: 18px 8px 18px 18px; border-radius: 22px;
+            background: var(--glass-soft); border: 1px solid var(--glass-hair);
+            box-shadow: var(--glass-inset);
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            max-height: calc(100vh - 120px); overflow-y: auto;
+        }
+        .toc-title { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--txt3); margin-bottom: 12px; }
+        .toc ol { list-style: none; counter-reset: toc; }
+        .toc li { counter-increment: toc; }
+        .toc a {
+            display: flex; gap: 10px; text-decoration: none; color: var(--txt2);
+            font-size: 13.5px; line-height: 1.42; padding: 7px 10px 7px 8px; border-radius: 10px;
+            border-left: 2px solid transparent; transition: color .18s, background .18s, border-color .18s;
+        }
+        .toc a::before { content: counter(toc); font-variant-numeric: tabular-nums; font-weight: 700; color: var(--txt3); flex: none; min-width: 15px; }
+        .toc a:hover { color: var(--txt); background: rgba(255,255,255,0.05); }
+        .toc a.active { color: var(--gold); border-left-color: var(--gold); background: rgba(255,211,77,0.07); }
+        .toc a.active::before { color: var(--gold); }
+        .toc-toggle { display: none; }
+
+        /* ===================== content ===================== */
+        .doc { min-width: 0; }
+        section.card {
+            padding: 30px 32px 34px; margin-bottom: 22px; border-radius: 26px;
+            background: var(--glass-soft); border: 1px solid var(--glass-hair);
+            box-shadow: var(--glass-inset), 0 18px 44px rgba(0,0,0,0.30);
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            scroll-margin-top: 84px;
+        }
+        section.card > h2 {
+            font-size: 24px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.24;
+            display: flex; align-items: baseline; gap: 12px;
+        }
+        section.card > h2 .num {
+            font-size: 13px; font-weight: 800; color: #4a3600; flex: none;
+            min-width: 26px; height: 26px; border-radius: 9px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--gold-pill); box-shadow: inset 0 1px 0 rgba(255,246,210,0.8);
+            transform: translateY(-2px);
+        }
+        section.card h3 { font-size: 16.5px; font-weight: 700; letter-spacing: -0.015em; margin-top: 26px; color: var(--txt); }
+        section.card h3:first-of-type { margin-top: 20px; }
+        section.card p { color: var(--txt2); margin-top: 11px; font-size: 15px; }
+        section.card p strong, section.card li strong { color: var(--txt); font-weight: 650; }
+        section.card ul, section.card ol { margin-top: 12px; padding-left: 20px; color: var(--txt2); font-size: 15px; }
+        section.card li { margin-top: 8px; }
+        section.card li::marker { color: var(--gold-deep); }
+        section.card a { color: var(--gold); text-decoration: none; border-bottom: 1px solid rgba(255,211,77,0.32); }
+        section.card a:hover { border-bottom-color: var(--gold); }
+        code {
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+            font-size: 0.88em; padding: 2px 6px; border-radius: 6px;
+            background: rgba(255,255,255,0.07); border: 1px solid var(--glass-hair); color: #FFE7A8;
+            white-space: nowrap;
+        }
+
+        .note {
+            margin-top: 18px; padding: 16px 18px; border-radius: 16px;
+            background: linear-gradient(180deg, rgba(255,211,77,0.10), rgba(255,171,0,0.045));
+            border: 1px solid rgba(255,211,77,0.22);
+            border-left: 3px solid var(--gold-deep);
+        }
+        .note p { margin-top: 0; color: rgba(255,255,255,0.72); }
+        .note p + p { margin-top: 9px; }
+        .note .label { display: block; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 7px; }
+
+        .tablewrap { margin-top: 16px; overflow-x: auto; border-radius: 16px; border: 1px solid var(--glass-hair); }
+        table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 440px; }
+        th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--glass-hair); color: var(--txt2); vertical-align: top; }
+        th { color: var(--txt); font-weight: 700; font-size: 13px; letter-spacing: 0.01em; background: rgba(255,255,255,0.045); }
+        tr:last-child td { border-bottom: none; }
+        td strong { color: var(--txt); }
+
+        details.faq {
+            margin-top: 12px; border-radius: 16px; overflow: hidden;
+            background: rgba(255,255,255,0.045); border: 1px solid var(--glass-hair);
+        }
+        details.faq > summary {
+            cursor: pointer; list-style: none; padding: 15px 18px;
+            font-size: 15px; font-weight: 650; color: var(--txt);
+            display: flex; align-items: flex-start; gap: 12px; transition: background .18s;
+        }
+        details.faq > summary::-webkit-details-marker { display: none; }
+        details.faq > summary:hover { background: rgba(255,255,255,0.04); }
+        details.faq > summary::after {
+            content: ""; flex: none; margin-left: auto; margin-top: 7px;
+            width: 8px; height: 8px; border-right: 2px solid var(--txt3); border-bottom: 2px solid var(--txt3);
+            transform: rotate(45deg); transition: transform .22s;
+        }
+        details.faq[open] > summary::after { transform: rotate(-135deg); }
+        details.faq[open] > summary { color: var(--gold); }
+        .faq-body { padding: 0 18px 17px; }
+        .faq-body p { margin-top: 0; }
+        .faq-body p + p { margin-top: 10px; }
+
+        .cta {
+            margin: 8px 0 40px; padding: 34px 32px; border-radius: 26px; text-align: center;
+            background: var(--glass-fill); border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-inset), var(--glass-shadow);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+        }
+        .cta h2 { font-size: 25px; font-weight: 800; letter-spacing: -0.025em; }
+        .cta p { color: var(--txt2); margin-top: 10px; font-size: 15px; }
+        .cta .btn { margin-top: 20px; padding: 13px 24px; font-size: 15px; }
+        .play-badge svg { width: 22px; height: 22px; flex: none; }
+        .pb-txt { text-align: left; line-height: 1.1; }
+        .pb-txt small { display: block; font-size: 10px; font-weight: 600; opacity: 0.72; letter-spacing: 0.04em; text-transform: uppercase; }
+        .pb-txt strong { display: block; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+
+        footer { position: relative; z-index: 1; padding: 40px 0 54px; border-top: 1px solid rgba(255,255,255,0.07); }
+        .foot-inner { display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+        .foot-links { display: flex; gap: 22px; flex-wrap: wrap; }
+        .foot-links a { color: var(--txt2); text-decoration: none; font-size: 14px; }
+        .foot-links a:hover { color: var(--txt); }
+        .foot-meta { color: var(--txt3); font-size: 13px; margin-top: 20px; }
+
+        @media (max-width: 940px) {
+            .layout { grid-template-columns: 1fr; gap: 0; }
+            .toc { position: static; margin-bottom: 22px; }
+            .toc-inner { max-height: none; padding: 0; background: none; border: none; box-shadow: none; backdrop-filter: none; }
+            /* nút bật/tắt đã ghi "Mục lục" — nhãn cố định phía trên chỉ lặp lại */
+            .toc-title { display: none; }
+            .toc-toggle {
+                display: block; width: 100%; text-align: left; cursor: pointer;
+                font-family: inherit; font-size: 14px; font-weight: 700; color: var(--txt);
+                padding: 14px 18px; border-radius: 16px;
+                background: var(--glass-soft); border: 1px solid var(--glass-hair);
+            }
+            .toc-toggle::after {
+                content: ""; float: right; margin-top: 7px;
+                width: 8px; height: 8px; border-right: 2px solid var(--txt3); border-bottom: 2px solid var(--txt3);
+                transform: rotate(45deg); transition: transform .22s;
+            }
+            .toc-toggle[aria-expanded="true"]::after { transform: rotate(-135deg); }
+            .toc ol { display: none; margin-top: 10px; padding: 10px; border-radius: 16px; background: var(--glass-soft); border: 1px solid var(--glass-hair); }
+            .toc ol.open { display: block; }
+            section.card { padding: 26px 22px 28px; border-radius: 22px; }
+            .hero { padding: 40px 0 24px; }
+        }
+        @media (max-width: 560px) {
+            .topbar { padding: 10px 16px; }
+            .brand .name { font-size: 16px; }
+            .bar-right .btn-gold { display: none; }
+            .wrap { padding: 0 16px; }
+            section.card > h2 { font-size: 20px; }
+            .cta { padding: 28px 20px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            * { transition: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient"></div>
+    <div class="grain"></div>
+
+    <header class="topbar">
+        <a class="brand" href="/">
+            <img class="mark" src="../../logo.png" alt="Biểu tượng ứng dụng PhimCa" width="36" height="36">
+            <span class="name">PhimCa</span>
+        </a>
+        <div class="bar-right">
+            <nav class="langsw" aria-label="Ngôn ngữ">
+                <a href="/manual/" hreflang="en">EN</a>
+                <a href="/manual/vi/" aria-current="true" hreflang="vi">VI</a>
+            </nav>
+            <a href="https://play.google.com/store/apps/details?id=com.phimca.app" class="btn btn-gold" target="_blank" rel="noopener">Tải ứng dụng</a>
+        </div>
+    </header>
+
+    <div class="wrap">
+        <section class="hero">
+            <span class="eyebrow"><span class="dot"></span> Hướng dẫn sử dụng &middot; phiên bản 3.8.2</span>
+            <h1>Tất cả những gì PhimCa <span class="grad">làm được</span>.</h1>
+            <p class="lead">PhimCa là cầu nối đưa phim và nhạc trong mạng nội bộ (ổ cứng mạng NAS, máy tính Windows, Samba trên Linux) hoặc trên bộ nhớ đám mây (Google Drive, OneDrive, Dropbox) lên Smart TV, máy chiếu, đầu thu AV và loa chuẩn DLNA/UPnP — hoặc phát trực tiếp ngay trên điện thoại. Hướng dẫn này bao gồm phần thiết lập, truyền phát, âm thanh độ phân giải cao, phụ đề và khắc phục sự cố.</p>
+        </section>
+
+        <div class="layout">
+            <!-- ============ MỤC LỤC ============ -->
+            <aside class="toc">
+                <div class="toc-inner">
+                    <div class="toc-title">Mục lục</div>
+                    <button class="toc-toggle" aria-expanded="false" aria-controls="toclist">Mục lục</button>
+                    <ol id="toclist">
+                        <li><a href="#s1">Yêu cầu hệ thống &amp; thiết lập mạng</a></li>
+                        <li><a href="#s2">Duyệt nguồn phương tiện</a></li>
+                        <li><a href="#s3">Phát và truyền (cast) phương tiện</a></li>
+                        <li><a href="#s4">Thư viện của bạn</a></li>
+                        <li><a href="#s5">Hàng đợi và danh sách phát đã lưu</a></li>
+                        <li><a href="#s6">Âm thanh lossless &amp; độ phân giải cao</a></li>
+                        <li><a href="#s7">Video và phụ đề</a></li>
+                        <li><a href="#s8">Phản chiếu màn hình</a></li>
+                        <li><a href="#s9">Quản lý bản tải xuống đám mây</a></li>
+                        <li><a href="#s10">Tối ưu hóa pin</a></li>
+                        <li><a href="#s11">Bản miễn phí và bản Premium</a></li>
+                        <li><a href="#s12">Khắc phục sự cố &amp; câu hỏi thường gặp</a></li>
+                    </ol>
+                </div>
+            </aside>
+
+            <!-- ============ NỘI DUNG ============ -->
+            <main class="doc">
+
+                <!-- 1 -->
+                <section class="card" id="s1">
+                    <h2><span class="num">1</span> Yêu cầu hệ thống &amp; thiết lập mạng</h2>
+
+                    <h3>Yêu cầu hệ thống</h3>
+                    <ul>
+                        <li><strong>Hệ điều hành:</strong> Android 8.0 (API 26) trở lên.</li>
+                        <li><strong>Quyền truy cập mạng:</strong> PhimCa cần quyền truy cập mạng để tìm các thiết bị trong mạng nội bộ.</li>
+                        <li><strong>Quyền truy cập bộ nhớ:</strong> Trên Android 13 trở lên, PhimCa xin ba quyền <code>READ_MEDIA_AUDIO</code>, <code>READ_MEDIA_VIDEO</code> và <code>READ_MEDIA_IMAGES</code>. Cả ba đều cần thiết: quyền nhạc và video dùng để quét thư viện trên máy, còn quyền hình ảnh là thứ cho phép đọc ảnh bìa album và ảnh trong thư mục. Nếu bạn từ chối quyền hình ảnh, Android sẽ âm thầm ẩn các tệp ảnh khỏi PhimCa và ảnh bìa của nhạc trên máy sẽ không hiển thị.</li>
+                    </ul>
+
+                    <h3>Thiết lập mạng</h3>
+                    <p>Để tính năng truyền (cast) và duyệt mạng nội bộ hoạt động, <strong>điện thoại và thiết bị nhận (TV, máy chiếu, đầu thu AV) phải kết nối chung một mạng Wi-Fi.</strong></p>
+                    <ul>
+                        <li>Khuyên dùng Wi-Fi băng tần 5 GHz để phát video bitrate lớn hoặc nhạc lossless chất lượng cao được mượt mà.</li>
+                        <li>Hãy đảm bảo <strong>"Cách ly AP"</strong> (AP Isolation) và <strong>"Chế độ mạng khách"</strong> (Guest Network Mode) đã được tắt trên router — cả hai đều ngăn các thiết bị trong mạng giao tiếp với nhau.</li>
+                    </ul>
+
+                    <h3>Bố cục giao diện</h3>
+                    <p>PhimCa có bốn tab ở cạnh dưới màn hình (hoặc dọc theo cạnh trái khi xoay ngang):</p>
+                    <div class="tablewrap">
+                        <table>
+                            <thead><tr><th>Tab</th><th>Công dụng</th></tr></thead>
+                            <tbody>
+                                <tr><td><strong>Thư viện</strong></td><td>Trung tâm của ứng dụng — mục gần đây, danh sách phát đã lưu, album, nghệ sĩ và tìm kiếm.</td></tr>
+                                <tr><td><strong>Đang phát</strong></td><td>Trình phát đầy đủ: ảnh bìa, thanh tua, thông tin định dạng âm thanh và các nút điều khiển.</td></tr>
+                                <tr><td><strong>Hàng đợi</strong></td><td>Danh sách các bài đang chờ phát, cũng là nơi lưu hàng đợi thành danh sách phát.</td></tr>
+                                <tr><td><strong>Thêm</strong></td><td>Nguồn phương tiện, phản chiếu màn hình, cài đặt và thông tin ứng dụng.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- 2 -->
+                <section class="card" id="s2">
+                    <h2><span class="num">2</span> Duyệt nguồn phương tiện</h2>
+                    <p>PhimCa phân loại nguồn phương tiện thành ba nhóm: <strong>bộ nhớ trên máy</strong>, <strong>thư mục chia sẻ mạng (SMB)</strong> và <strong>bộ nhớ đám mây</strong>. Bạn truy cập từ giao diện trống ở tab <strong>Thư viện</strong> hoặc từ tab <strong>Thêm</strong>, mục "Nguồn phương tiện".</p>
+
+                    <h3>A. Bộ nhớ trên máy &amp; thẻ nhớ SD</h3>
+                    <ul>
+                        <li>PhimCa tự động quét bộ nhớ trong và thẻ nhớ ngoài để tìm các tệp âm thanh và video.</li>
+                        <li>Để làm mới hoặc quét thủ công, vào <strong>Cài đặt</strong> (Thêm → Cài đặt) và chọn <strong>Quét thư viện trên máy</strong> trong phần Thư viện.</li>
+                        <li>Bản quét đọc trực tiếp cơ sở dữ liệu phương tiện của Android nên bao trùm cả bộ nhớ trong lẫn thẻ nhớ SD. Những tệp bạn đã xóa hoặc đổi tên sẽ được gỡ khỏi thư viện ở lần quét kế tiếp.</li>
+                    </ul>
+
+                    <h3>B. Thư mục chia sẻ mạng (SMB/CIFS)</h3>
+                    <p>Bạn có thể kết nối tới thư mục chia sẻ trên máy tính Windows, Mac, Linux và các thiết bị NAS như Synology, QNAP, TrueNAS, Unraid.</p>
+                    <ul>
+                        <li><strong>Tự động tìm kiếm:</strong> khi mở bảng "Nguồn phương tiện", PhimCa quét nhanh 2–3 giây trên mạng nội bộ bằng nhiều phương thức cùng lúc (SSDP, mDNS, NetBIOS và bộ nhớ đệm ARP), sau đó rà các cổng SMB là <strong>445 và 139</strong>. Chỉ những máy chủ thực sự trả lời trên cổng SMB mới được liệt kê, và PhimCa còn kiểm tra thêm rằng máy đó có ít nhất một thư mục chia sẻ duyệt được — nhờ vậy router, máy in và camera IP không lọt vào danh sách.</li>
+                        <li><strong>Thêm thủ công:</strong> nếu NAS hoặc máy tính không tự động xuất hiện, hãy thêm bằng cách nhập địa chỉ IP cùng tên đăng nhập và mật khẩu.</li>
+                        <li><strong>Phiên bản giao thức SMB:</strong> bản trên Google Play chỉ hỗ trợ <strong>SMB2 và SMB3</strong>. Giao thức SMB1 đời cũ <strong>không có</strong> trong bản Play Store — nó bị vô hiệu hóa ngay từ khi biên dịch, nên các thiết bị rất cũ chỉ nói được SMB1 (Buffalo LinkStation đời đầu, firmware Synology/QNAP cũ) sẽ không duyệt được. Nếu NAS của bạn có tùy chọn bật SMB2/SMB3, hãy bật trong phần cài đặt của NAS.</li>
+                        <li><strong>Máy chủ đang tắt:</strong> nếu một NAS đã lưu đang tắt nguồn, PhimCa nhận ra rất nhanh và bỏ qua thay vì bị treo. Bạn không cần xóa mục đó — nó sẽ kết nối lại bình thường khi máy chủ bật lên.</li>
+                    </ul>
+
+                    <h3>C. Bộ nhớ đám mây (Google Drive, OneDrive, Dropbox…)</h3>
+                    <p>Chọn dòng <strong>Mở tệp</strong> trong "Nguồn phương tiện" để gọi trình chọn tệp mặc định của Android, rồi duyệt Google Drive, OneDrive, Dropbox hay bất kỳ dịch vụ nào đã cấu hình trên máy. PhimCa dùng chính trình chọn tệp sẵn có của điện thoại, nên bạn không phải tạo tài khoản PhimCa hay đăng nhập đám mây riêng.</p>
+                </section>
+
+                <!-- 3 -->
+                <section class="card" id="s3">
+                    <h2><span class="num">3</span> Phát và truyền (cast) phương tiện</h2>
+                    <p>PhimCa có cơ chế phát kép: <strong>phát trên điện thoại</strong> và <strong>truyền (cast)</strong> lên màn hình hoặc dàn loa ngoài.</p>
+
+                    <h3>Phát trên điện thoại</h3>
+                    <ul>
+                        <li>Chỉ cần chạm vào một tệp âm thanh bất kỳ để nghe ngay trên máy.</li>
+                        <li>Trình phát video được tối ưu cho việc truyền. Nếu bạn chọn một video khi máy đang ở chế độ phát trên điện thoại ("Điện thoại này"), PhimCa sẽ yêu cầu bạn chọn thiết bị nhận.</li>
+                        <li>Nội dung đang phát hiển thị trên màn hình khóa kèm ảnh bìa và đầy đủ nút điều khiển, đồng thời nhận lệnh từ nút bấm trên tai nghe Bluetooth và tai nghe có dây.</li>
+                    </ul>
+
+                    <h3>Truyền lên thiết bị DLNA/UPnP</h3>
+                    <ol>
+                        <li>Nhấn nút <strong>Cast</strong> (trên thanh công cụ hoặc trong tab <strong>Đang phát</strong>) để mở danh sách thiết bị.</li>
+                        <li>Chọn thiết bị nhận DLNA/UPnP — máy chiếu, Smart TV hoặc đầu thu AV.</li>
+                        <li>Chọn một tệp phim hoặc nhạc bất kỳ để bắt đầu truyền.</li>
+                        <li>Dùng tab <strong>Đang phát</strong> để điều khiển: phát, tạm dừng, tua, bài trước, bài kế, phát ngẫu nhiên, lặp lại.</li>
+                    </ol>
+
+                    <div class="note">
+                        <span class="label">Truyền liền mạch</span>
+                        <p>PhimCa hỗ trợ truyền liền mạch (gapless casting), và tính năng này <strong>được bật sẵn</strong>. Bài tiếp theo được nạp trước lên thiết bị nhận ngay trước khi bài hiện tại kết thúc, để thiết bị tự chuyển thẳng sang bài kế. Điều này loại bỏ khoảng lặng giữa các bài — rất quan trọng với album nhạc live hay nhạc giao hưởng — đồng thời giúp hàng đợi tiếp tục chạy cả khi màn hình điện thoại đã tắt, vì thiết bị nhận không còn phải chờ ứng dụng.</p>
+                        <p>Nếu một thiết bị nhận nào đó hoạt động không ổn định, hãy tắt trong <strong>Cài đặt → Truyền liền mạch</strong>.</p>
+                    </div>
+
+                    <h3>Khi một bài không phát được</h3>
+                    <p>Nếu một bài không thể bắt đầu — thư mục chia sẻ mất kết nối, liên kết đám mây hết hạn, tệp đã bị di chuyển — PhimCa sẽ chuyển sang bài kế tiếp thay vì dừng hẳn hàng đợi, kèm một thông báo ngắn giải thích chuyện gì đã xảy ra.</p>
+                </section>
+
+                <!-- 4 -->
+                <section class="card" id="s4">
+                    <h2><span class="num">4</span> Thư viện của bạn</h2>
+                    <p>Tab <strong>Thư viện</strong> là trung tâm của bộ sưu tập. Mọi thứ bạn từng phát đều được ghi nhớ tại đây, và bản quét trên máy (<strong>Cài đặt → Quét thư viện trên máy</strong>) sẽ bổ sung toàn bộ nhạc và video có sẵn trong điện thoại và thẻ nhớ.</p>
+
+                    <h3>Mục gần đây</h3>
+                    <ul>
+                        <li>Dải phía trên hiển thị <strong>15 bài bạn vừa phát gần nhất</strong> kèm ảnh bìa (PhimCa ghi nhớ 25 mục gần nhất).</li>
+                        <li>Nhấn vào ảnh bìa để phát hoặc cast ngay. PhimCa khôi phục đúng ngữ cảnh trước đó — nếu bài đó vốn thuộc một album hay một hàng đợi, cả nhóm sẽ được phát tiếp chứ không chỉ phát trơ trọi một bài.</li>
+                    </ul>
+
+                    <h3>Danh sách phát, Album và Nghệ sĩ</h3>
+                    <p>Ngay bên dưới dải mục gần đây là ba nút chuyển đổi nội dung hiển thị:</p>
+                    <ul>
+                        <li><strong>Danh sách phát</strong> — các danh sách phát bạn đã lưu (xem <a href="#s5">phần 5</a>).</li>
+                        <li><strong>Album</strong> — lưới ảnh bìa dựng từ những bài PhimCa đã biết. Album được nhóm theo thẻ album <em>và</em> theo thư mục chứa bản phát hành, nên hai album khác nhau vô tình trùng tên vẫn được tách riêng. Nhấn vào một album để xem danh sách bài, phát hoặc thêm vào hàng đợi.</li>
+                        <li><strong>Nghệ sĩ</strong> — cũng dữ liệu đó nhưng nhóm theo nghệ sĩ. Những bài hoàn toàn không có thẻ nghệ sĩ được gom riêng chứ không bị bỏ sót.</li>
+                    </ul>
+
+                    <h3>Tìm kiếm</h3>
+                    <p>Chạm vào ô tìm kiếm để tra cứu trên toàn bộ dữ liệu PhimCa đang có: thư viện đã lập chỉ mục, hàng đợi, mục gần đây, danh sách phát đã lưu, và cả thư mục bạn đang duyệt.</p>
+                    <p>Kết quả được gom thành từng nhóm thay vì đổ dồn vào một danh sách dài — <strong>Thư mục hiện tại</strong>, <strong>Album</strong>, <strong>Nghệ sĩ</strong>, <strong>Bài hát</strong>, <strong>Video</strong> và <strong>Danh sách phát</strong> — kèm số lượng bên cạnh mỗi nhóm. Mở một nhóm để xem chi tiết, rồi phát một kết quả hoặc thêm cả nhóm vào hàng đợi.</p>
+                    <div class="note">
+                        <span class="label">Phạm vi</span>
+                        <p>Tìm kiếm hoạt động trên dữ liệu PhimCa đã lập chỉ mục cùng thư mục chia sẻ bạn đang mở. Ứng dụng không quét ngầm toàn bộ ổ NAS của bạn.</p>
+                    </div>
+                </section>
+
+                <!-- 5 -->
+                <section class="card" id="s5">
+                    <h2><span class="num">5</span> Hàng đợi và danh sách phát đã lưu</h2>
+
+                    <h3>Hàng đợi</h3>
+                    <p>Tab <strong>Hàng đợi</strong> hiển thị những gì đang chờ được phát. Bạn có thể thêm bài từ bất cứ đâu trong ứng dụng, sắp xếp lại thứ tự, xóa từng bài hoặc xóa sạch hàng đợi. Việc xóa có hiệu lực ngay lập tức — kể cả trên thiết bị nhận khi đang cast, nên một bài đã xóa sẽ không bất ngờ phát lại ở phần sau của lượt nghe.</p>
+
+                    <h3>Danh sách phát đã lưu</h3>
+                    <ul>
+                        <li>Để giữ lại một hàng đợi, mở tab <strong>Hàng đợi</strong> và chọn <strong>Lưu hàng đợi</strong>.</li>
+                        <li>Danh sách phát đã lưu xuất hiện trong tab Thư viện ở nút <strong>Danh sách phát</strong>, mỗi mục kèm ảnh bìa dạng collage ghép tự động tối đa 4 ảnh bìa từ các bài bên trong.</li>
+                        <li>Chạm vào danh sách phát để nghe ngay (thay thế hàng đợi hiện tại). Nhấn biểu tượng ba chấm ở dòng danh sách phát để <strong>thêm vào hàng đợi</strong> thay vì thay thế, hoặc để đổi tên và xóa.</li>
+                        <li>Nếu một tệp đám mây trong danh sách phát đã bị xóa vĩnh viễn hoặc bị thu hồi quyền truy cập, PhimCa sẽ bỏ qua và gỡ mục đó ra. Còn với lỗi tạm thời — mạng chập chờn, NAS đang khởi động lại — ứng dụng chỉ bỏ qua bài đó chứ không xóa gì cả.</li>
+                    </ul>
+                </section>
+
+                <!-- 6 -->
+                <section class="card" id="s6">
+                    <h2><span class="num">6</span> Âm thanh lossless &amp; độ phân giải cao</h2>
+                    <p>PhimCa được thiết kế để đáp ứng các tiêu chuẩn khắt khe nhất của giới nghe nhạc chất lượng cao.</p>
+
+                    <h3>Tín hiệu PCM chuẩn bit-perfect</h3>
+                    <p>Với các định dạng PCM, PhimCa đảm bảo đường truyền bit-perfect tuyệt đối từ tệp nguồn đến bộ giải mã DAC:</p>
+                    <ul>
+                        <li><strong>Không lấy mẫu lại</strong> — luồng âm thanh được truyền đúng tần số lấy mẫu gốc.</li>
+                        <li><strong>Không xử lý ẩn (DSP)</strong> — không áp dụng bộ cân bằng, chỉnh âm lượng hay chuẩn hóa âm lượng nào.</li>
+                        <li><strong>Không chuyển đổi định dạng</strong> — không bao giờ đổi âm thanh số nguyên sang số thực (float), vốn có thể gây nhiễu lượng tử hóa trên một số phần cứng Android.</li>
+                        <li>Hỗ trợ các định dạng PCM lossless gồm <strong>FLAC, ALAC, WAV, AIFF, APE và WavPack (.wv)</strong> lên đến <strong>192 kHz / 24-bit</strong>.</li>
+                    </ul>
+                    <p>Âm lượng do thiết bị nhận hoặc hệ điều hành Android quản lý — bản thân PhimCa không bao giờ nhân chỉnh mẫu tín hiệu.</p>
+
+                    <h3>Giới hạn tần số lấy mẫu cao (chỉ khi phát trên máy)</h3>
+                    <p>Phần lớn phần cứng điện thoại không thể mở luồng âm thanh vượt quá 192 kHz, khiến tệp trở nên hoàn toàn không phát được. PhimCa có cơ chế dự phòng tự động khi phát trên máy:</p>
+                    <ul>
+                        <li>Tệp lossless từ <strong>192 kHz trở xuống được giữ nguyên bản gốc, hoàn toàn bit-perfect</strong>.</li>
+                        <li>Tệp lossless <strong>trên 192 kHz</strong> (352.8 kHz, 384 kHz…) được hạ tần số theo lũy thừa của 2 — 384 kHz → 192 kHz, 352.8 kHz → 176.4 kHz — để phát được trên điện thoại.</li>
+                    </ul>
+                    <p>Cơ chế này chỉ áp dụng khi phát trên chính điện thoại.</p>
+
+                    <h3>Phát nhạc DSF / DSD</h3>
+                    <p>Tệp Direct Stream Digital (<code>.dsf</code> / <code>.dff</code>) không thể truyền trực tiếp đến hầu hết thiết bị DLNA, nên PhimCa chuyển đổi theo thời gian thực:</p>
+                    <ul>
+                        <li><strong>Chuyển đổi thời gian thực:</strong> tệp DSD64 và DSD128 được chuyển trực tiếp sang <strong>LPCM 192 kHz 16-bit</strong>.</li>
+                        <li><strong>Bù âm lượng gốc:</strong> một hệ số khuếch đại <strong>&times;1.87 (khoảng +5.4 dB)</strong> được áp dụng khi chuyển đổi để bù cho mức đỉnh điều chế thấp hơn của DSD, giúp âm lượng tương đồng với các tệp PCM thông thường. Đây là quy ước chuẩn khi chuyển DSD sang PCM, không phải một bộ chỉnh âm lượng.</li>
+                        <li><strong>Độ tương thích thiết bị:</strong> PhimCa gửi kèm thẻ định danh <code>DLNA.ORG_PN=LPCM</code> và MIME <code>audio/L16;rate=192000;channels=2</code>, để các đầu thu cao cấp như OPPO BDP-105 chọn đúng bộ giải mã LPCM thay vì phát ra tiếng xì.</li>
+                    </ul>
+
+                    <h3>Truyền tệp WavPack</h3>
+                    <p>Hầu hết thiết bị nhận không có bộ giải mã WavPack, nên cast trực tiếp tệp <code>.wv</code> sẽ thất bại. PhimCa giải mã ngay trên điện thoại rồi gửi tới thiết bị nhận luồng LPCM 16-bit đúng tần số lấy mẫu gốc — chính là đường truyền đã được kiểm chứng với DSD. Hỗ trợ nguồn đến 192 kHz; tệp WavPack 24-bit được gửi ở dạng 16-bit khi cast. Việc phát tệp <code>.wv</code> <strong>trên điện thoại</strong> không bị ảnh hưởng, vẫn giữ bit-perfect và tua tới/lui bình thường.</p>
+
+                    <h3>Tổng quan định dạng hỗ trợ</h3>
+                    <div class="tablewrap">
+                        <table>
+                            <tbody>
+                                <tr><th>Âm thanh</th><td>MP3, FLAC, WAV, AAC, OGG, WMA, M4A, Opus, ALAC, AIFF, APE, DSF, DFF, MKA, WV</td></tr>
+                                <tr><th>Video</th><td>MP4, MKV, AVI, MOV, WMV, WebM, M4V, MPG, MPEG, M2TS, TS, FLV</td></tr>
+                                <tr><th>Phụ đề</th><td>SRT, VTT, ASS, SSA</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- 7 -->
+                <section class="card" id="s7">
+                    <h2><span class="num">7</span> Video và phụ đề</h2>
+
+                    <h3>Định dạng video hỗ trợ</h3>
+                    <p>PhimCa hỗ trợ nhiều định dạng video phổ biến, gồm <strong>MP4, MKV, AVI, MOV, WMV, WebM, M4V, MPG, TS, M2TS và FLV</strong>.</p>
+
+                    <h3>Hỗ trợ phụ đề rời</h3>
+                    <p>PhimCa hiển thị được phụ đề rời (<strong>SRT, VTT, ASS và SSA</strong>) tải trực tiếp từ thư mục chia sẻ mạng.</p>
+                    <ul>
+                        <li><strong>Tự động nhận:</strong> đặt tệp phụ đề cùng thư mục với video và đặt tên trùng nhau (ví dụ <code>phim.mkv</code> và <code>phim.srt</code>), PhimCa sẽ tự tìm thấy.</li>
+                        <li><strong>Tự chọn phụ đề:</strong> bạn cũng có thể chọn tệp phụ đề thủ công bằng <strong>Chọn phụ đề</strong> nếu tên tệp không trùng khớp.</li>
+                        <li><strong>Đổi phụ đề trực tiếp:</strong> bạn có thể thay đổi hoặc bật/tắt phụ đề ngay giữa lúc đang phát. Thiết bị nhận sẽ tạm dừng một chút để áp dụng cấu hình mới rồi tự động phát tiếp đúng vị trí cũ.</li>
+                    </ul>
+
+                    <h3>Khi TV không đọc được tệp phụ đề rời</h3>
+                    <p>Một số thiết bị — điển hình là máy chiếu Hisense C1S — đơn giản là không hiển thị tệp phụ đề rời gửi qua DLNA, nhưng <em>lại hiển thị được</em> phụ đề đã nhúng sẵn bên trong tệp video.</p>
+                    <p>Khi phát hiện thiết bị thuộc nhóm này, PhimCa sẽ đề nghị <strong>nhúng phụ đề giúp bạn</strong>: ứng dụng tạo một bản sao của video có sẵn luồng phụ đề bên trong.</p>
+                    <ul>
+                        <li>Chọn <strong>Nhúng phụ đề</strong> khi được hỏi. Với một bộ phim dài, quá trình này mất vài phút.</li>
+                        <li><strong>Video vẫn tiếp tục phát trong lúc chuyển đổi</strong>, rồi tự khởi động lại kèm phụ đề khi bản sao hoàn tất.</li>
+                        <li>Chức năng tua tới/lui dùng lại được ngay khi quá trình chuyển đổi kết thúc.</li>
+                        <li>Mỗi lần chỉ chạy một tiến trình chuyển đổi, và mỗi bản sao nhúng một ngôn ngữ phụ đề. Nếu định dạng video không thể chuyển đổi, PhimCa sẽ thông báo và phát video không có phụ đề.</li>
+                    </ul>
+                    <p>Các bản sao này nằm trong bộ nhớ tạm của ứng dụng nên Android có thể thu hồi khi máy sắp đầy; khi đó PhimCa chỉ việc tạo lại ở lần sau.</p>
+                </section>
+
+                <!-- 8 -->
+                <section class="card" id="s8">
+                    <h2><span class="num">8</span> Phản chiếu màn hình <span style="font-size:13px;font-weight:700;color:var(--gold);align-self:center">PREMIUM</span></h2>
+                    <p>Phản chiếu màn hình đưa toàn bộ hình ảnh và âm thanh từ điện thoại lên TV hoặc máy chiếu hỗ trợ DLNA. Đây là tính năng thuộc bản <strong>Premium</strong>, truy cập từ tab <strong>Thêm</strong>.</p>
+
+                    <h3>Chế độ riêng tư (Privacy Mode)</h3>
+                    <p>Khi phản chiếu thông thường, tin nhắn đến, thông tin ngân hàng và các nội dung nhạy cảm khác rất dễ bị lộ trên màn hình lớn. PhimCa giải quyết bằng <strong>Chế độ riêng tư</strong>, mặc định bật sẵn:</p>
+                    <ul>
+                        <li><strong>Chọn ứng dụng phát:</strong> trước khi phản chiếu, bạn chọn đúng ứng dụng muốn trình chiếu.</li>
+                        <li><strong>Tự động tạm dừng:</strong> nếu bạn thoát ứng dụng đó ra màn hình chính hoặc chuyển sang ứng dụng khác, PhimCa lập tức đóng băng hình ảnh và hiển thị màn hình tĩnh <strong>"Chế độ riêng tư: Đang tạm dừng"</strong> trên TV. Hình ảnh tự động truyền tiếp khi bạn quay lại.</li>
+                        <li><strong>Yêu cầu:</strong> tính năng này cần quyền <strong>Truy cập dữ liệu sử dụng</strong> (<code>PACKAGE_USAGE_STATS</code>) trong Cài đặt hệ thống. PhimCa hiển thị hộp thoại giải thích rõ trước khi điều hướng bạn tới đó.</li>
+                    </ul>
+
+                    <h3>Tích hợp chế độ Không làm phiền (DND)</h3>
+                    <ul>
+                        <li>Khi bật <strong>Ẩn thông báo khi phản chiếu</strong> trong Cài đặt, PhimCa tự đưa điện thoại về chế độ Không làm phiền suốt thời gian phản chiếu, để thông báo không hiện lên làm gián đoạn.</li>
+                        <li><strong>Yêu cầu:</strong> quyền <strong>Truy cập chế độ Không làm phiền</strong> (<code>ACCESS_NOTIFICATION_POLICY</code>). Nếu chưa cấp, Cài đặt của PhimCa sẽ hiện cảnh báo kèm liên kết cấu hình nhanh.</li>
+                    </ul>
+
+                    <h3>Bản quyền nội dung (FLAG_SECURE)</h3>
+                    <p>Một số ứng dụng có bản quyền — Netflix, Amazon Prime, ứng dụng ngân hàng — chặn việc quay chụp màn hình. Khi phản chiếu các ứng dụng này, màn hình TV sẽ chỉ hiển thị màu đen. Đây là cơ chế bảo mật mặc định của Android và hoàn toàn bình thường.</p>
+                </section>
+
+                <!-- 9 -->
+                <section class="card" id="s9">
+                    <h2><span class="num">9</span> Quản lý bản tải xuống đám mây</h2>
+                    <p>Khi bạn truyền tệp từ kho đám mây như Google Drive, các nhà cung cấp thường giới hạn thời gian tồn tại của liên kết tải — khiến việc phát bị dừng giữa album hoặc lỗi khi chuyển bài trong một hàng đợi dài.</p>
+                    <p>Để khắc phục, PhimCa tải một bản sao bền bỉ của tệp đám mây vào bộ nhớ trong ngay khi bạn bấm phát.</p>
+                    <ul>
+                        <li><strong>Quản lý dung lượng:</strong> <strong>Cài đặt → Tải xuống đám mây</strong> cho biết tổng dung lượng các tệp này đang chiếm.</li>
+                        <li><strong>Xóa bộ nhớ tạm:</strong> nhấn <strong>Xóa bản tải xuống đám mây</strong> để giải phóng dung lượng ngay.</li>
+                        <li><strong>Giới hạn dung lượng:</strong> đặt mức tối đa (1 GB, 5 GB, 10 GB…) qua mục <strong>Giới hạn lưu trữ đám mây</strong>. Khi vượt quá, PhimCa tự xóa các tệp ít được phát nhất trước. Các tệp thuộc một danh sách phát đã lưu được bảo vệ khỏi cơ chế dọn dẹp này.</li>
+                    </ul>
+                    <p>Tệp nằm trên thẻ nhớ SD được đọc trực tiếp tại chỗ và không bao giờ bị sao chép.</p>
+                </section>
+
+                <!-- 10 -->
+                <section class="card" id="s10">
+                    <h2><span class="num">10</span> Tối ưu hóa pin</h2>
+                    <p>Cơ chế tiết kiệm pin nghiêm ngặt của Android (chế độ Doze và App Standby của các hãng) có thể đóng băng ứng dụng chạy nền khi màn hình tắt, khiến hàng đợi truyền bị dừng hoặc không chuyển bài.</p>
+                    <p>Để ngăn lỗi chạy nền:</p>
+                    <ol>
+                        <li>Vào <strong>Cài đặt → Truyền phát (Casting)</strong>.</li>
+                        <li>Chọn mục <strong>Phát nền (Background playback)</strong>, hoặc nhấn nút thông tin bên cạnh.</li>
+                        <li>PhimCa sẽ điều hướng bạn tới cài đặt Tối ưu hóa pin của hệ thống Android.</li>
+                        <li>Đặt mức sử dụng pin của PhimCa thành <strong>Không hạn chế</strong> (Unrestricted / Không tối ưu hóa).</li>
+                        <li>Công tắc trong Cài đặt PhimCa sẽ chuyển sang <strong>BẬT</strong> khi hệ thống ghi nhận thay đổi.</li>
+                    </ol>
+                    <p>Việc để bật <strong>Truyền liền mạch</strong> (mặc định) cũng giúp ích: thiết bị nhận đã giữ sẵn bài kế tiếp, nên hàng đợi vẫn chạy tiếp ngay cả khi Android đóng băng ứng dụng.</p>
+                </section>
+
+                <!-- 11 -->
+                <section class="card" id="s11">
+                    <h2><span class="num">11</span> Bản miễn phí và bản Premium</h2>
+                    <p><strong>Phát nhạc và phim trên điện thoại là hoàn toàn miễn phí và không giới hạn</strong> — không giới hạn số bài, hỗ trợ đầy đủ mọi định dạng âm thanh và mọi mức chất lượng.</p>
+                    <p><strong>Tính năng truyền (cast) cũng miễn phí</strong>, có kèm quảng cáo, với một giới hạn duy nhất: ở bản miễn phí, mỗi lượt truyền chạy được <strong>16 bài</strong>. Khi một lượt kết thúc, PhimCa sẽ báo rõ lý do dừng chứ không im lặng. Đây là giới hạn về độ dài một lượt phát tự động, <em>không phải</em> giới hạn những bài nào được phép truyền. Mọi bài trong hàng đợi đều phát được: chỉ cần chạm vào một dòng bất kỳ là việc truyền tiếp tục từ đó.</p>
+                    <p><strong>Phản chiếu màn hình chỉ có ở bản Premium.</strong></p>
+                    <p><strong>Premium</strong> là gói <strong>mua một lần</strong> — không phải thuê bao. Gói này gỡ bỏ toàn bộ quảng cáo, bỏ giới hạn độ dài lượt truyền và mở khóa phản chiếu màn hình. Nếu bạn cài lại ứng dụng hoặc đổi sang điện thoại mới, hãy dùng <strong>Khôi phục giao dịch mua</strong> trong Cài đặt.</p>
+
+                    <h3>Quyền riêng tư</h3>
+                    <p>PhimCa không có tài khoản để đăng ký và không yêu cầu đăng nhập. Dữ liệu phương tiện của bạn không rời khỏi mạng nội bộ: SMB, DLNA và phát trên máy đều là lưu lượng chạy trong mạng LAN giữa điện thoại, máy chủ và TV của bạn. Các kết nối ra ngoài duy nhất là việc kiểm tra giao dịch mua/quyền sử dụng và, ở bản miễn phí, việc phân phối quảng cáo cùng hộp thoại xin đồng ý đi kèm. Bản Premium loại bỏ các kết nối quảng cáo này.</p>
+                    <p>PhimCa hỗ trợ 15 ngôn ngữ, chọn trong <strong>Cài đặt → Ngôn ngữ</strong>.</p>
+                </section>
+
+                <!-- 12 -->
+                <section class="card" id="s12">
+                    <h2><span class="num">12</span> Khắc phục sự cố &amp; câu hỏi thường gặp</h2>
+
+                    <details class="faq">
+                        <summary>Tại sao thiết bị DLNA không xuất hiện trong danh sách Cast?</summary>
+                        <div class="faq-body"><p>Hãy kiểm tra điện thoại và thiết bị nhận có đang ở đúng cùng một mạng Wi-Fi và cùng băng tần hay không (cả hai cùng 2.4 GHz, hoặc cùng 5 GHz). Đảm bảo AP Isolation và Guest Mode trên router đã tắt. Nhấn lại nút cast sẽ kích hoạt một đợt quét SSDP/mDNS mới.</p></div>
+                    </details>
+
+                    <details class="faq">
+                        <summary>NAS của tôi không hiện ra trong danh sách thiết bị.</summary>
+                        <div class="faq-body"><p>PhimCa chỉ liệt kê máy chủ nào trả lời trên cổng SMB (445 hoặc 139) <em>và</em> có ít nhất một thư mục chia sẻ duyệt được — chính điều này giữ cho router và máy in không lọt vào danh sách. Hãy kiểm tra tính năng chia sẻ tệp đã bật chưa, và NAS đã bật <strong>SMB2 hoặc SMB3</strong> chưa; bản trên Google Play không hỗ trợ SMB1. Nếu vẫn không thấy, hãy thêm thủ công bằng địa chỉ IP trong bảng Nguồn phương tiện.</p></div>
+                    </details>
+
+                    <details class="faq">
+                        <summary>Tại sao nhạc DSF/DSD của tôi chỉ phát ra tiếng xì lớn?</summary>
+                        <div class="faq-body"><p>Lỗi này xảy ra khi đầu thu AV hoặc DAC hiểu luồng PCM nhận được là dữ liệu thô, hoặc không nhận dạng được định dạng mẫu. Hãy chắc chắn thiết bị của bạn hỗ trợ giải mã <strong>LPCM 192 kHz 16-bit</strong>, và kiểm tra xem nó có hiểu thẻ giao thức <code>DLNA.ORG_PN=LPCM</code> không — PhimCa gửi thẻ này mặc định chính là để kích hoạt đúng bộ giải mã LPCM.</p></div>
+                    </details>
+
+                    <details class="faq">
+                        <summary>Tại sao phụ đề không hiển thị trên TV?</summary>
+                        <div class="faq-body">
+                            <p>Trước tiên hãy đảm bảo tệp phụ đề nằm chung thư mục với video trên ổ chia sẻ và có cùng tên (ví dụ <code>MyVideo.mp4</code> và <code>MyVideo.srt</code>), hoặc chọn thủ công bằng <strong>Chọn phụ đề</strong>.</p>
+                            <p>Một số dòng TV và máy chiếu DLNA không hỗ trợ tệp phụ đề rời, hoặc chỉ hỗ trợ SRT. Nếu PhimCa nhận ra thiết bị của bạn thuộc nhóm đó, ứng dụng sẽ đề nghị <a href="#s7">nhúng phụ đề vào một bản sao của video</a>.</p>
+                        </div>
+                    </details>
+
+                    <details class="faq">
+                        <summary>Tại sao nhạc bị dừng hoặc không chuyển bài khi khóa màn hình?</summary>
+                        <div class="faq-body"><p>Android đang đóng băng tiến trình phương tiện chạy nền để tiết kiệm pin. Hãy làm theo <a href="#s10">phần 10</a> để đưa cấu hình pin của PhimCa về <strong>Không hạn chế</strong>, và giữ bật <strong>Truyền liền mạch</strong>.</p></div>
+                    </details>
+
+                    <details class="faq">
+                        <summary>Nhạc của tôi ngừng phát sau một tiếng thông báo hoặc cuộc gọi.</summary>
+                        <div class="faq-body"><p>PhimCa nhường quyền phát âm thanh cho hệ thống khi có cuộc gọi hoặc thông báo, rồi tự phát tiếp sau đó. Nếu không tự tiếp tục, hãy nhấn nút phát trong tab <strong>Đang phát</strong> hoặc trên màn hình khóa.</p></div>
+                    </details>
+
+                    <details class="faq">
+                        <summary>Ảnh bìa của một số bài bị mất.</summary>
+                        <div class="faq-body"><p>Trên Android 13 trở lên, hãy kiểm tra PhimCa còn quyền đọc <strong>hình ảnh</strong> hay không — ảnh bìa của nhạc trên máy phụ thuộc vào quyền này. Sau đó chạy <strong>Cài đặt → Quét thư viện trên máy</strong> để làm mới dữ liệu.</p></div>
+                    </details>
+
+                    <details class="faq">
+                        <summary>Bài hát tôi đã xóa vẫn còn trong mục Album.</summary>
+                        <div class="faq-body"><p>Dữ liệu thư viện được làm mới sau mỗi lần quét. Hãy chạy <strong>Cài đặt → Quét thư viện trên máy</strong>, các tệp đã xóa sẽ biến mất.</p></div>
+                    </details>
+
+                    <details class="faq">
+                        <summary>Phiên bản miễn phí có những giới hạn gì?</summary>
+                        <div class="faq-body"><p>Phát nhạc và phim trên điện thoại là hoàn toàn miễn phí và không giới hạn. Tính năng truyền miễn phí và có quảng cáo, với mỗi lượt truyền ở bản miễn phí chạy được 16 bài — bạn luôn có thể chạm vào một dòng khác để tiếp tục. Phản chiếu màn hình yêu cầu bản Premium. Chỉ cần mua Premium một lần duy nhất để gỡ bỏ quảng cáo, bỏ giới hạn độ dài lượt truyền và mở khóa phản chiếu màn hình.</p></div>
+                    </details>
+                </section>
+
+                <div class="cta">
+                    <h2>Sẵn sàng truyền phát?</h2>
+                    <p>PhimCa miễn phí để dùng thử — phát trên điện thoại không giới hạn, và tính năng truyền hoạt động ngay từ đầu.</p>
+                    <a href="https://play.google.com/store/apps/details?id=com.phimca.app" class="btn btn-gold play-badge" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="#3a2a00" aria-hidden="true"><path d="M3.6 2.3c-.3.3-.5.7-.5 1.3v16.8c0 .6.2 1 .5 1.3l.1.1L13 12.1v-.2L3.7 2.2l-.1.1z"/><path d="M16.3 15.4l-3.3-3.3v-.2l3.3-3.3.1.1 3.9 2.2c1.1.6 1.1 1.7 0 2.4l-4 2.1z"/><path d="M16.4 15.3L13 12 3.6 21.7c.4.4 1 .4 1.7 0l11.1-6.4z"/><path d="M16.4 8.7L5.3 2.3c-.7-.4-1.3-.4-1.7 0L13 12l3.4-3.3z"/></svg>
+                        <span class="pb-txt"><small>Tải về trên</small><strong>Google Play</strong></span>
+                    </a>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <footer>
+        <div class="wrap foot-inner">
+            <a class="brand" href="/">
+                <img class="mark" src="../../logo.png" alt="Biểu tượng ứng dụng PhimCa" width="36" height="36">
+                <span class="name">PhimCa</span>
+            </a>
+            <div class="foot-links">
+                <a href="/">Trang chủ</a>
+                <a href="/manual/" hreflang="en">English</a>
+                <a href="https://vietace.github.io/phimca-privacy/" target="_blank" rel="noopener">Chính sách quyền riêng tư</a>
+                <a href="https://play.google.com/store/apps/details?id=com.phimca.app" target="_blank" rel="noopener">Google Play</a>
+                <a class="js-email" href="#contact">Liên hệ hỗ trợ</a>
+            </div>
+        </div>
+        <div class="wrap"><p class="foot-meta">&copy; 2026 PhimCa &middot; com.phimca.app &middot; Hướng dẫn sử dụng cho phiên bản 3.8.2 &middot; Hỗ trợ: <a class="js-email" href="#contact" style="color:inherit">liên hệ</a></p></div>
+    </footer>
+
+    <script>
+    (function () {
+        // ---- mục lục thu gọn trên màn hình nhỏ ----
+        var toggle = document.querySelector('.toc-toggle');
+        var list = document.getElementById('toclist');
+        if (toggle && list) {
+            toggle.addEventListener('click', function () {
+                var open = list.classList.toggle('open');
+                toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            });
+            list.addEventListener('click', function (e) {
+                if (e.target.tagName === 'A' && window.matchMedia('(max-width: 940px)').matches) {
+                    list.classList.remove('open');
+                    toggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+
+        // ---- làm nổi bật phần đang xem ----
+        var links = Array.prototype.slice.call(document.querySelectorAll('#toclist a'));
+        var byId = {};
+        links.forEach(function (a) { byId[a.getAttribute('href').slice(1)] = a; });
+        var sections = Array.prototype.slice.call(document.querySelectorAll('section.card[id]'));
+
+        if ('IntersectionObserver' in window) {
+            var visible = {};
+            var obs = new IntersectionObserver(function (entries) {
+                entries.forEach(function (en) { visible[en.target.id] = en.isIntersecting; });
+                var current = null;
+                for (var i = 0; i < sections.length; i++) {
+                    if (visible[sections[i].id]) { current = sections[i].id; break; }
+                }
+                links.forEach(function (a) { a.classList.remove('active'); });
+                if (current && byId[current]) byId[current].classList.add('active');
+            }, { rootMargin: '-84px 0px -65% 0px', threshold: 0 });
+            sections.forEach(function (s) { obs.observe(s); });
+        }
+
+        // ---- địa chỉ hỗ trợ ghép lúc chạy, giữ nguyên cách làm của trang chủ ----
+        var user = 'epicmediadev', domain = 'gmail.com', addr = user + '@' + domain;
+        Array.prototype.forEach.call(document.querySelectorAll('a.js-email'), function (a) {
+            a.setAttribute('href', 'mailto:' + addr);
+            a.textContent = addr;
+        });
+    })();
+    </script>
+</body>
+</html>

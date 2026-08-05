@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>PhimCa User Manual — cast NAS, SMB &amp; cloud media to your TV</title>
+    <meta name="description" content="The complete PhimCa user manual: connect NAS and SMB shares, cast to DLNA TVs and hi-fi, bit-perfect and DSD audio, subtitles, screen mirroring, and troubleshooting.">
+    <meta name="theme-color" content="#050505">
+    <link rel="canonical" href="https://phimca.com/manual/">
+
+    <link rel="alternate" hreflang="en" href="https://phimca.com/manual/">
+    <link rel="alternate" hreflang="vi" href="https://phimca.com/manual/vi/">
+    <link rel="alternate" hreflang="x-default" href="https://phimca.com/manual/">
+
+    <link rel="icon" type="image/png" href="../logo.png">
+    <link rel="apple-touch-icon" href="../logo.png">
+
+    <meta property="og:title" content="PhimCa User Manual">
+    <meta property="og:description" content="Connect NAS and SMB shares, cast to DLNA TVs and hi-fi, bit-perfect and DSD audio, subtitles, screen mirroring, and troubleshooting.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://phimca.com/manual/">
+    <meta property="og:image" content="https://phimca.com/og-image.png">
+    <meta property="og:image:width" content="1024">
+    <meta property="og:image:height" content="500">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="PhimCa User Manual">
+    <meta name="twitter:description" content="Connect NAS and SMB shares, cast to DLNA TVs and hi-fi, bit-perfect and DSD audio, subtitles, screen mirroring, and troubleshooting.">
+    <meta name="twitter:image" content="https://phimca.com/og-image.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --canvas: #060608;
+            --gold: #FFD34D;
+            --gold-strong: #FFC000;
+            --gold-deep: #FFAB00;
+            --txt: #F7F7F7;
+            --txt2: rgba(255, 255, 255, 0.60);
+            --txt3: rgba(255, 255, 255, 0.42);
+
+            /* App glass recipe (from ui/theme/Glass.kt + MediaBridgeTheme.kt) */
+            --glass-fill: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06));
+            --glass-soft: linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.03));
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --glass-hair: rgba(255, 255, 255, 0.09);
+            --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+            --glass-shadow: 0 22px 50px rgba(0, 0, 0, 0.45);
+            --gold-pill: linear-gradient(180deg, #FFDF77 0%, #F7C339 55%, #EBAD18 100%);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+            font-feature-settings: "cv05" 1, "cv11" 1;
+            background: var(--canvas);
+            color: var(--txt);
+            min-height: 100vh;
+            line-height: 1.62;
+            overflow-x: hidden;
+        }
+
+        .ambient {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background:
+                radial-gradient(48% 30% at 100% -4%, rgba(45, 90, 190, 0.34), transparent 68%),
+                radial-gradient(38% 26% at 8% 6%,   rgba(255, 190, 20, 0.30), transparent 64%),
+                radial-gradient(40% 34% at 96% 60%, rgba(130, 90, 220, 0.20), transparent 72%),
+                radial-gradient(50% 30% at 24% 108%, rgba(255, 185, 20, 0.24), transparent 66%);
+        }
+        .grain {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.5;
+            background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
+            background-size: 3px 3px;
+        }
+
+        .wrap { position: relative; z-index: 1; width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 22px; }
+
+        /* ===================== top bar ===================== */
+        .topbar {
+            position: sticky; top: 0; z-index: 40;
+            display: flex; align-items: center; justify-content: space-between; gap: 14px;
+            padding: 12px 22px;
+            background: rgba(8, 8, 11, 0.72);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        .brand { display: inline-flex; align-items: center; gap: 11px; text-decoration: none; color: inherit; }
+        .brand .mark { width: 36px; height: 36px; border-radius: 11px; object-fit: cover; border: 1px solid rgba(255,255,255,0.14); }
+        .brand .name { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
+        .bar-right { display: flex; align-items: center; gap: 10px; }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            font-family: inherit; font-size: 14px; font-weight: 600; letter-spacing: -0.01em;
+            text-decoration: none; cursor: pointer; white-space: nowrap;
+            padding: 9px 17px; border-radius: 100px;
+            transition: transform 0.22s cubic-bezier(0.4,0,0.2,1), box-shadow 0.22s, background 0.22s;
+        }
+        .btn-glass {
+            color: var(--txt);
+            background: var(--glass-fill);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-inset);
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+        }
+        .btn-glass:hover { transform: translateY(-1px); background: linear-gradient(180deg, rgba(255,255,255,0.19), rgba(255,255,255,0.09)); }
+        .btn-gold {
+            color: #4a3600;
+            background: var(--gold-pill);
+            border: 1px solid rgba(255, 226, 130, 0.85);
+            box-shadow: 0 0 26px 3px rgba(255,190,0,0.24), inset 0 1px 0 rgba(255,246,210,0.85);
+        }
+        .btn-gold:hover { transform: translateY(-1px); box-shadow: 0 0 36px 7px rgba(255,190,0,0.36), inset 0 1px 0 rgba(255,246,210,0.9); }
+
+        /* language switch */
+        .langsw { display: inline-flex; padding: 3px; gap: 2px; border-radius: 100px; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-hair); }
+        .langsw a {
+            font-size: 12.5px; font-weight: 700; letter-spacing: 0.02em; text-decoration: none;
+            color: var(--txt3); padding: 5px 12px; border-radius: 100px; transition: color .2s, background .2s;
+        }
+        .langsw a:hover { color: var(--txt); }
+        .langsw a[aria-current="true"] { color: #4a3600; background: var(--gold-pill); box-shadow: inset 0 1px 0 rgba(255,246,210,0.7); }
+
+        /* ===================== hero ===================== */
+        .hero { padding: 54px 0 30px; }
+        .eyebrow {
+            display: inline-flex; align-items: center; gap: 9px;
+            font-size: 12.5px; font-weight: 600; letter-spacing: 0.02em; color: var(--txt2);
+            padding: 7px 15px; border-radius: 100px;
+            background: var(--glass-soft); border: 1px solid var(--glass-hair);
+        }
+        .eyebrow .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 10px 1px rgba(255,190,0,0.7); }
+        .hero h1 { font-size: clamp(34px, 6vw, 54px); font-weight: 900; letter-spacing: -0.035em; line-height: 1.06; margin-top: 20px; }
+        .hero h1 .grad {
+            background: linear-gradient(96deg, var(--gold) 0%, var(--gold-deep) 62%, #FF8A3D 100%);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .hero .lead { font-size: 16.5px; color: var(--txt2); max-width: 64ch; margin-top: 16px; }
+
+        /* ===================== layout ===================== */
+        .layout { display: grid; grid-template-columns: 252px minmax(0, 1fr); gap: 40px; align-items: start; padding-bottom: 30px; }
+
+        /* TOC */
+        .toc { position: sticky; top: 84px; }
+        .toc-inner {
+            padding: 18px 8px 18px 18px; border-radius: 22px;
+            background: var(--glass-soft); border: 1px solid var(--glass-hair);
+            box-shadow: var(--glass-inset);
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            max-height: calc(100vh - 120px); overflow-y: auto;
+        }
+        .toc-title { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--txt3); margin-bottom: 12px; }
+        .toc ol { list-style: none; counter-reset: toc; }
+        .toc li { counter-increment: toc; }
+        .toc a {
+            display: flex; gap: 10px; text-decoration: none; color: var(--txt2);
+            font-size: 13.5px; line-height: 1.4; padding: 7px 10px 7px 8px; border-radius: 10px;
+            border-left: 2px solid transparent; transition: color .18s, background .18s, border-color .18s;
+        }
+        .toc a::before { content: counter(toc); font-variant-numeric: tabular-nums; font-weight: 700; color: var(--txt3); flex: none; min-width: 15px; }
+        .toc a:hover { color: var(--txt); background: rgba(255,255,255,0.05); }
+        .toc a.active { color: var(--gold); border-left-color: var(--gold); background: rgba(255,211,77,0.07); }
+        .toc a.active::before { color: var(--gold); }
+
+        /* mobile TOC */
+        .toc-toggle { display: none; }
+
+        /* ===================== content ===================== */
+        .doc { min-width: 0; }
+        section.card {
+            padding: 30px 32px 34px; margin-bottom: 22px; border-radius: 26px;
+            background: var(--glass-soft); border: 1px solid var(--glass-hair);
+            box-shadow: var(--glass-inset), 0 18px 44px rgba(0,0,0,0.30);
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            scroll-margin-top: 84px;
+        }
+        section.card > h2 {
+            font-size: 24px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.2;
+            display: flex; align-items: baseline; gap: 12px;
+        }
+        section.card > h2 .num {
+            font-size: 13px; font-weight: 800; color: #4a3600; flex: none;
+            min-width: 26px; height: 26px; border-radius: 9px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--gold-pill); box-shadow: inset 0 1px 0 rgba(255,246,210,0.8);
+            transform: translateY(-2px);
+        }
+        section.card h3 { font-size: 16.5px; font-weight: 700; letter-spacing: -0.015em; margin-top: 26px; color: var(--txt); }
+        section.card h3:first-of-type { margin-top: 20px; }
+        section.card h4 { font-size: 14.5px; font-weight: 700; margin-top: 18px; color: var(--txt); }
+        section.card p { color: var(--txt2); margin-top: 11px; font-size: 15px; }
+        section.card p strong, section.card li strong { color: var(--txt); font-weight: 650; }
+        section.card ul, section.card ol { margin-top: 12px; padding-left: 20px; color: var(--txt2); font-size: 15px; }
+        section.card li { margin-top: 8px; }
+        section.card li::marker { color: var(--gold-deep); }
+        section.card a { color: var(--gold); text-decoration: none; border-bottom: 1px solid rgba(255,211,77,0.32); }
+        section.card a:hover { border-bottom-color: var(--gold); }
+        code {
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+            font-size: 0.88em; padding: 2px 6px; border-radius: 6px;
+            background: rgba(255,255,255,0.07); border: 1px solid var(--glass-hair); color: #FFE7A8;
+            white-space: nowrap;
+        }
+
+        /* note callout */
+        .note {
+            margin-top: 18px; padding: 16px 18px; border-radius: 16px;
+            background: linear-gradient(180deg, rgba(255,211,77,0.10), rgba(255,171,0,0.045));
+            border: 1px solid rgba(255,211,77,0.22);
+            border-left: 3px solid var(--gold-deep);
+        }
+        .note p { margin-top: 0; color: rgba(255,255,255,0.72); }
+        .note p + p { margin-top: 9px; }
+        .note .label { display: block; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 7px; }
+
+        /* table */
+        .tablewrap { margin-top: 16px; overflow-x: auto; border-radius: 16px; border: 1px solid var(--glass-hair); }
+        table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 420px; }
+        th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--glass-hair); color: var(--txt2); vertical-align: top; }
+        th { color: var(--txt); font-weight: 700; font-size: 13px; letter-spacing: 0.01em; background: rgba(255,255,255,0.045); }
+        tr:last-child td { border-bottom: none; }
+        td strong { color: var(--txt); }
+
+        /* FAQ */
+        details.faq {
+            margin-top: 12px; border-radius: 16px; overflow: hidden;
+            background: rgba(255,255,255,0.045); border: 1px solid var(--glass-hair);
+        }
+        details.faq > summary {
+            cursor: pointer; list-style: none; padding: 15px 18px;
+            font-size: 15px; font-weight: 650; color: var(--txt);
+            display: flex; align-items: flex-start; gap: 12px; transition: background .18s;
+        }
+        details.faq > summary::-webkit-details-marker { display: none; }
+        details.faq > summary:hover { background: rgba(255,255,255,0.04); }
+        details.faq > summary::after {
+            content: ""; flex: none; margin-left: auto; margin-top: 7px;
+            width: 8px; height: 8px; border-right: 2px solid var(--txt3); border-bottom: 2px solid var(--txt3);
+            transform: rotate(45deg); transition: transform .22s;
+        }
+        details.faq[open] > summary::after { transform: rotate(-135deg); }
+        details.faq[open] > summary { color: var(--gold); }
+        .faq-body { padding: 0 18px 17px; }
+        .faq-body p { margin-top: 0; }
+        .faq-body p + p { margin-top: 10px; }
+
+        /* CTA */
+        .cta {
+            margin: 8px 0 40px; padding: 34px 32px; border-radius: 26px; text-align: center;
+            background: var(--glass-fill); border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-inset), var(--glass-shadow);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+        }
+        .cta h2 { font-size: 25px; font-weight: 800; letter-spacing: -0.025em; }
+        .cta p { color: var(--txt2); margin-top: 10px; font-size: 15px; }
+        .cta .btn { margin-top: 20px; padding: 13px 24px; font-size: 15px; }
+        .play-badge svg { width: 22px; height: 22px; flex: none; }
+        .pb-txt { text-align: left; line-height: 1.1; }
+        .pb-txt small { display: block; font-size: 10px; font-weight: 600; opacity: 0.72; letter-spacing: 0.04em; text-transform: uppercase; }
+        .pb-txt strong { display: block; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+
+        /* footer */
+        footer { position: relative; z-index: 1; padding: 40px 0 54px; border-top: 1px solid rgba(255,255,255,0.07); }
+        .foot-inner { display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+        .foot-links { display: flex; gap: 22px; flex-wrap: wrap; }
+        .foot-links a { color: var(--txt2); text-decoration: none; font-size: 14px; }
+        .foot-links a:hover { color: var(--txt); }
+        .foot-meta { color: var(--txt3); font-size: 13px; margin-top: 20px; }
+
+        /* ===================== responsive ===================== */
+        @media (max-width: 940px) {
+            .layout { grid-template-columns: 1fr; gap: 0; }
+            .toc { position: static; margin-bottom: 22px; }
+            .toc-inner { max-height: none; padding: 0; background: none; border: none; box-shadow: none; backdrop-filter: none; }
+            /* the toggle button already reads "Contents" — the standing label would just repeat it */
+            .toc-title { display: none; }
+            .toc-toggle {
+                display: block; width: 100%; text-align: left; cursor: pointer;
+                font-family: inherit; font-size: 14px; font-weight: 700; color: var(--txt);
+                padding: 14px 18px; border-radius: 16px;
+                background: var(--glass-soft); border: 1px solid var(--glass-hair);
+            }
+            .toc-toggle::after {
+                content: ""; float: right; margin-top: 7px;
+                width: 8px; height: 8px; border-right: 2px solid var(--txt3); border-bottom: 2px solid var(--txt3);
+                transform: rotate(45deg); transition: transform .22s;
+            }
+            .toc-toggle[aria-expanded="true"]::after { transform: rotate(-135deg); }
+            .toc ol { display: none; margin-top: 10px; padding: 10px; border-radius: 16px; background: var(--glass-soft); border: 1px solid var(--glass-hair); }
+            .toc ol.open { display: block; }
+            .toc a.active { background: rgba(255,211,77,0.07); }
+            section.card { padding: 26px 22px 28px; border-radius: 22px; }
+            .hero { padding: 40px 0 24px; }
+        }
+        @media (max-width: 560px) {
+            .topbar { padding: 10px 16px; }
+            .brand .name { font-size: 16px; }
+            .bar-right .btn-gold { display: none; }
+            .wrap { padding: 0 16px; }
+            section.card > h2 { font-size: 21px; }
+            .cta { padding: 28px 20px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            * { transition: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient"></div>
+    <div class="grain"></div>
+
+    <header class="topbar">
+        <a class="brand" href="/">
+            <img class="mark" src="../logo.png" alt="PhimCa app icon" width="36" height="36">
+            <span class="name">PhimCa</span>
+        </a>
+        <div class="bar-right">
+            <nav class="langsw" aria-label="Language">
+                <a href="/manual/" aria-current="true" hreflang="en">EN</a>
+                <a href="/manual/vi/" hreflang="vi">VI</a>
+            </nav>
+            <a href="https://play.google.com/store/apps/details?id=com.phimca.app" class="btn btn-gold" target="_blank" rel="noopener">Get the app</a>
+        </div>
+    </header>
+
+    <div class="wrap">
+        <section class="hero">
+            <span class="eyebrow"><span class="dot"></span> User manual &middot; app version 3.8.2</span>
+            <h1>Everything PhimCa <span class="grad">can do</span>.</h1>
+            <p class="lead">PhimCa bridges media on your local network (NAS, Windows PCs, Linux Samba) or in cloud storage (Google Drive, OneDrive, Dropbox) to DLNA/UPnP TVs, projectors, AV receivers and hi-fi speakers — or plays it right on your phone. This manual covers setup, casting, high-resolution audio, subtitles and troubleshooting.</p>
+        </section>
+
+        <div class="layout">
+            <!-- ============ TOC ============ -->
+            <aside class="toc">
+                <div class="toc-inner">
+                    <div class="toc-title">Contents</div>
+                    <button class="toc-toggle" aria-expanded="false" aria-controls="toclist">Contents</button>
+                    <ol id="toclist">
+                        <li><a href="#s1">System requirements &amp; network setup</a></li>
+                        <li><a href="#s2">Browsing media sources</a></li>
+                        <li><a href="#s3">Playing and casting media</a></li>
+                        <li><a href="#s4">Your library</a></li>
+                        <li><a href="#s5">The queue and saved playlists</a></li>
+                        <li><a href="#s6">Audiophile &amp; high-resolution audio</a></li>
+                        <li><a href="#s7">Videos and subtitles</a></li>
+                        <li><a href="#s8">Screen mirroring</a></li>
+                        <li><a href="#s9">Managing cloud downloads</a></li>
+                        <li><a href="#s10">Battery optimization</a></li>
+                        <li><a href="#s11">Free tier and Premium</a></li>
+                        <li><a href="#s12">Troubleshooting &amp; FAQs</a></li>
+                    </ol>
+                </div>
+            </aside>
+
+            <!-- ============ DOC ============ -->
+            <main class="doc">
+
+                <!-- 1 -->
+                <section class="card" id="s1">
+                    <h2><span class="num">1</span> System requirements &amp; network setup</h2>
+
+                    <h3>System requirements</h3>
+                    <ul>
+                        <li><strong>Android OS:</strong> Android 8.0 (API 26) or higher.</li>
+                        <li><strong>Network permissions:</strong> PhimCa requires network access to discover local devices.</li>
+                        <li><strong>Storage permissions:</strong> On Android 13 and newer, PhimCa asks for <code>READ_MEDIA_AUDIO</code>, <code>READ_MEDIA_VIDEO</code> and <code>READ_MEDIA_IMAGES</code>. All three matter: audio and video populate the on-device library scan, and images are what allow folder and album art to be read. If you deny the image permission, Android silently hides picture files from PhimCa and cover art on local folders stops working.</li>
+                    </ul>
+
+                    <h3>Network setup</h3>
+                    <p>For casting and local network browsing to work, <strong>your phone and your rendering devices (TV, projector, AV receiver) must be on the same local Wi-Fi network.</strong></p>
+                    <ul>
+                        <li>5 GHz Wi-Fi is highly recommended for smooth playback of high-bitrate video or high-resolution lossless audio.</li>
+                        <li>Make sure <strong>AP Isolation</strong> (Access Point Isolation) or <strong>Guest Network Mode</strong> is switched off in your router settings — both prevent local devices from talking to each other.</li>
+                    </ul>
+
+                    <h3>Interface layout</h3>
+                    <p>PhimCa has four tabs along the bottom (or down the left edge in landscape):</p>
+                    <div class="tablewrap">
+                        <table>
+                            <thead><tr><th>Tab</th><th>Purpose</th></tr></thead>
+                            <tbody>
+                                <tr><td><strong>Library</strong></td><td>Your hub — recently played, saved playlists, albums, artists, and search.</td></tr>
+                                <tr><td><strong>Playing</strong></td><td>The full player: cover art, seek bar, audio format strip, and transport controls.</td></tr>
+                                <tr><td><strong>Queue</strong></td><td>The tracks lined up to play, and where you save a queue as a playlist.</td></tr>
+                                <tr><td><strong>More</strong></td><td>Media sources, screen mirroring, settings, and app info.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- 2 -->
+                <section class="card" id="s2">
+                    <h2><span class="num">2</span> Browsing media sources</h2>
+                    <p>PhimCa organizes media sources into three types: <strong>local storage</strong>, <strong>network shares (SMB)</strong>, and <strong>cloud drives</strong>. Reach them from the <strong>Library</strong> empty state or the <strong>More</strong> tab, under "Media Sources".</p>
+
+                    <h3>A. Local storage &amp; SD cards</h3>
+                    <ul>
+                        <li>PhimCa automatically scans internal storage and SD cards for audio and video files.</li>
+                        <li>To refresh or scan manually, go to <strong>Settings</strong> (More → Settings) and tap <strong>Scan device library</strong> under the Library section.</li>
+                        <li>The scan reads Android's own media database, so it covers internal storage and removable SD cards alike. Files you later delete or rename are removed from the library on the next scan.</li>
+                    </ul>
+
+                    <h3>B. Network shares (SMB/CIFS)</h3>
+                    <p>Connect to shared folders on Windows PCs, Mac, Linux, and NAS units such as Synology, QNAP, TrueNAS and Unraid.</p>
+                    <ul>
+                        <li><strong>Automatic discovery:</strong> opening the "Media Sources" sheet triggers a fast 2–3 second scan of your network using several methods at once (SSDP, mDNS, NetBIOS and the ARP cache), then a sweep of the SMB ports <strong>445 and 139</strong>. Only hosts that actually answer on an SMB port are listed, and PhimCa additionally checks that at least one browsable share exists — so routers, printers and IP cameras stay out of the list.</li>
+                        <li><strong>Manual setup:</strong> if your NAS or PC isn't discovered, add it by entering its IP address and login credentials.</li>
+                        <li><strong>SMB protocol versions:</strong> the Google Play build speaks <strong>SMB2 and SMB3</strong> only. Legacy SMB1 is not included in the Play Store version — it is disabled at build time, so very old units (early Buffalo LinkStation, older Synology/QNAP firmware) that only speak SMB1 cannot be browsed. If your NAS offers an SMB2/SMB3 option, enable it there.</li>
+                        <li><strong>Powered-off servers:</strong> if a saved NAS is switched off, PhimCa detects that quickly and moves on instead of hanging. You don't need to remove the entry — it reconnects once the server is back.</li>
+                    </ul>
+
+                    <h3>C. Cloud storage (Google Drive, OneDrive, Dropbox…)</h3>
+                    <p>Tap the <strong>Open file</strong> row inside "Media Sources" to open Android's own file picker, then browse Google Drive, OneDrive, Dropbox or any other provider configured on your device. PhimCa uses the picker your phone already has, so there's no separate PhimCa account and no extra cloud login.</p>
+                </section>
+
+                <!-- 3 -->
+                <section class="card" id="s3">
+                    <h2><span class="num">3</span> Playing and casting media</h2>
+                    <p>PhimCa has a dual-mode playback system: <strong>local playback</strong> on your phone, and <strong>casting</strong> to external screens or audio systems.</p>
+
+                    <h3>Local playback</h3>
+                    <ul>
+                        <li>Tap any audio file to play it directly on your phone.</li>
+                        <li>Video playback is optimized for casting. If you pick a video while the phone is set to local playback ("This Phone"), PhimCa asks you to choose a cast target.</li>
+                        <li>Playback appears on your lock screen with cover art and full transport controls, and responds to Bluetooth and wired headset buttons.</li>
+                    </ul>
+
+                    <h3>DLNA/UPnP casting</h3>
+                    <ol>
+                        <li>Tap the <strong>Cast</strong> button (top bar, or in the <strong>Playing</strong> tab) to open the device picker.</li>
+                        <li>Select your DLNA or UPnP renderer — projector, smart TV, AV receiver.</li>
+                        <li>Tap any media file to start casting.</li>
+                        <li>Use the <strong>Playing</strong> tab to control playback: play, pause, seek, previous, next, shuffle, repeat.</li>
+                    </ol>
+
+                    <div class="note">
+                        <span class="label">Gapless casting</span>
+                        <p>PhimCa supports gapless casting, and it is <strong>on by default</strong>. The next track is pre-loaded onto your DLNA renderer shortly before the current one ends, so the renderer moves straight from one to the next. That removes the silence between tracks — crucial for gapless albums, live recordings and classical works — and it also keeps the queue advancing when your phone screen is off, because the renderer no longer waits on the app.</p>
+                        <p>If a particular renderer misbehaves, turn it off under <strong>Settings → Gapless casting</strong>.</p>
+                    </div>
+
+                    <h3>If a track fails</h3>
+                    <p>If a track can't be started — a share went offline, a cloud link expired, a file was moved — PhimCa skips to the next track rather than stopping the queue, and shows a brief message explaining what happened.</p>
+                </section>
+
+                <!-- 4 -->
+                <section class="card" id="s4">
+                    <h2><span class="num">4</span> Your library</h2>
+                    <p>The <strong>Library</strong> tab is the hub of your collection. Everything you play is remembered here, and the on-device scan (<strong>Settings → Scan device library</strong>) fills it out with the music and video already on your phone and SD card.</p>
+
+                    <h3>Recently played</h3>
+                    <ul>
+                        <li>The strip at the top shows your <strong>15 most recent tracks</strong> with cover art (PhimCa remembers the last 25).</li>
+                        <li>Tap any cover to play or cast it instantly. PhimCa restores the context it was played in — tapping a track that came from an album or a queue resumes that whole set, rather than playing a single orphaned track.</li>
+                    </ul>
+
+                    <h3>Playlists, Albums and Artists</h3>
+                    <p>Below the strip are three pills that switch what the hub lists:</p>
+                    <ul>
+                        <li><strong>Playlists</strong> — your saved playlists (see <a href="#s5">section 5</a>).</li>
+                        <li><strong>Albums</strong> — a cover grid built from the tracks PhimCa knows about. Albums are grouped by album tag <em>and</em> by the folder a release lives in, so two different releases that happen to share an album name stay separate. Tap an album to see its tracks and play or queue them.</li>
+                        <li><strong>Artists</strong> — the same index grouped by artist. Tracks with no artist tag at all are grouped separately rather than being dropped.</li>
+                    </ul>
+
+                    <h3>Search</h3>
+                    <p>Tap the search field to search everything PhimCa knows: your library index, your queue, your recently played, your saved playlists, and the folder you're currently browsing.</p>
+                    <p>Results are grouped into folders rather than dumped into one long list — <strong>Current folder</strong>, <strong>Albums</strong>, <strong>Artists</strong>, <strong>Tracks</strong>, <strong>Videos</strong> and <strong>Playlists</strong> — with a count next to each. Open a group to drill into it, then play a result or add the whole group to your queue.</p>
+                    <div class="note">
+                        <span class="label">Scope</span>
+                        <p>Search covers what PhimCa has already indexed plus the share folder you're browsing. It does not crawl an entire NAS in the background.</p>
+                    </div>
+                </section>
+
+                <!-- 5 -->
+                <section class="card" id="s5">
+                    <h2><span class="num">5</span> The queue and saved playlists</h2>
+
+                    <h3>The queue</h3>
+                    <p>The <strong>Queue</strong> tab shows what's lined up to play. Add tracks to it from anywhere in the app, reorder them, remove them, or clear the queue. Removing a track takes effect immediately — including on the renderer if you're casting, so a deleted track won't sneak back in later in the run.</p>
+
+                    <h3>Saved playlists</h3>
+                    <ul>
+                        <li>To keep a queue, open the <strong>Queue</strong> tab and tap <strong>Save Queue</strong>.</li>
+                        <li>Saved playlists appear in the Library tab under the <strong>Playlists</strong> pill, each with an automatic collage of up to 4 cover arts from the tracks inside.</li>
+                        <li>Tapping a playlist starts playback immediately and replaces the current queue. Use the three-dot menu on a playlist row to <strong>add it to the queue instead</strong>, or to rename or delete it.</li>
+                        <li>If a cloud file in a saved playlist has been permanently deleted or its permission revoked, PhimCa skips it and removes that entry. A temporary failure — the network dropped, the NAS was rebooting — only skips the track; nothing is deleted.</li>
+                    </ul>
+                </section>
+
+                <!-- 6 -->
+                <section class="card" id="s6">
+                    <h2><span class="num">6</span> Audiophile &amp; high-resolution audio</h2>
+                    <p>PhimCa is built to satisfy the strict requirements of high-fidelity listening.</p>
+
+                    <h3>Bit-perfect PCM audio path</h3>
+                    <p>For PCM-based formats, PhimCa guarantees a bit-perfect path from source file to rendering DAC:</p>
+                    <ul>
+                        <li><strong>No resampling</strong> — the stream is delivered at its native sample rate.</li>
+                        <li><strong>No DSP</strong> — no processing, equalization, volume scaling or normalization is applied.</li>
+                        <li><strong>No format conversion</strong> — integer audio is never converted to float, which can introduce quantization noise on Android hardware.</li>
+                        <li>Supported PCM lossless formats include <strong>FLAC, ALAC, WAV, AIFF, APE and WavPack (.wv)</strong> up to <strong>192 kHz / 24-bit</strong>.</li>
+                    </ul>
+                    <p>Volume is handled by your renderer or by Android — PhimCa never scales the samples itself.</p>
+
+                    <h3>High sample-rate capping (local playback only)</h3>
+                    <p>Most phone hardware can't open an audio track above 192 kHz, which would otherwise leave the file silently unplayable. PhimCa includes an automatic fallback for local playback:</p>
+                    <ul>
+                        <li>Lossless files at <strong>192 kHz or below are kept completely untouched and bit-perfect</strong>.</li>
+                        <li>Lossless files <strong>above 192 kHz</strong> (352.8 kHz, 384 kHz…) are halved by a power of two — 384 kHz → 192 kHz, 352.8 kHz → 176.4 kHz — so they remain playable on your phone.</li>
+                    </ul>
+                    <p>This applies only to playback on the phone itself.</p>
+
+                    <h3>DSF / DSD playback</h3>
+                    <p>Direct Stream Digital files (<code>.dsf</code> / <code>.dff</code>) can't be cast natively to most DLNA renderers, so PhimCa transcodes them in real time:</p>
+                    <ul>
+                        <li><strong>Real-time transcoding:</strong> DSD64 and DSD128 are converted on the fly to <strong>192 kHz 16-bit LPCM</strong>.</li>
+                        <li><strong>Level compensation:</strong> a gain of <strong>&times;1.87 (about +5.4 dB)</strong> is applied during conversion to compensate for DSD's lower modulation peaks, so the result matches the loudness of conventional PCM tracks. This is standard practice for DSD-to-PCM conversion, not a volume control.</li>
+                        <li><strong>Renderer compatibility:</strong> PhimCa reports the stream with the <code>DLNA.ORG_PN=LPCM</code> profile and MIME type <code>audio/L16;rate=192000;channels=2</code>, so high-end receivers such as the OPPO BDP-105 select their LPCM decoder instead of outputting loud static.</li>
+                    </ul>
+
+                    <h3>WavPack casting</h3>
+                    <p>Most renderers have no WavPack decoder, so casting a <code>.wv</code> file would normally fail. PhimCa decodes it on the phone and sends the renderer plain 16-bit LPCM at the file's own sample rate — the same proven path used for DSD. Sources up to 192 kHz are supported; 24-bit WavPack is sent as 16-bit when casting. Playing a <code>.wv</code> file <strong>on the phone</strong> is unaffected and stays bit-perfect, with full fast-forward and rewind.</p>
+
+                    <h3>Format support at a glance</h3>
+                    <div class="tablewrap">
+                        <table>
+                            <tbody>
+                                <tr><th>Audio</th><td>MP3, FLAC, WAV, AAC, OGG, WMA, M4A, Opus, ALAC, AIFF, APE, DSF, DFF, MKA, WV</td></tr>
+                                <tr><th>Video</th><td>MP4, MKV, AVI, MOV, WMV, WebM, M4V, MPG, MPEG, M2TS, TS, FLV</td></tr>
+                                <tr><th>Subtitles</th><td>SRT, VTT, ASS, SSA</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- 7 -->
+                <section class="card" id="s7">
+                    <h2><span class="num">7</span> Videos and subtitles</h2>
+
+                    <h3>Supported video formats</h3>
+                    <p>PhimCa supports a wide range of video formats, including <strong>MP4, MKV, AVI, MOV, WMV, WebM, M4V, MPG, TS, M2TS and FLV</strong>.</p>
+
+                    <h3>Subtitle support</h3>
+                    <p>PhimCa supports external subtitles (<strong>SRT, VTT, ASS and SSA</strong>) loaded directly from your network shares.</p>
+                    <ul>
+                        <li><strong>Automatic pickup:</strong> put the subtitle file in the same folder as the video with the same base filename (e.g. <code>movie.mkv</code> and <code>movie.srt</code>) and PhimCa finds it on its own.</li>
+                        <li><strong>Choosing one yourself:</strong> you can also pick a subtitle file manually with <strong>Select Subtitles</strong> if the names don't match.</li>
+                        <li><strong>Mid-playback switching:</strong> change subtitle tracks or toggle subtitles on and off during an active cast. The renderer briefly pauses, updates, and resumes automatically at the same position.</li>
+                    </ul>
+
+                    <h3>When your TV ignores subtitle files</h3>
+                    <p>Some devices — the Hisense C1S projector is the common example — simply don't display separate subtitle files sent over DLNA, but <em>do</em> display subtitles that are built into the video file.</p>
+                    <p>When PhimCa detects such a device it offers to <strong>embed the subtitles for you</strong>: it writes a copy of the video with the subtitle track built in.</p>
+                    <ul>
+                        <li>Tap <strong>Embed subtitles</strong> when prompted. The conversion takes a few minutes for a feature-length film.</li>
+                        <li><strong>The video keeps playing while it converts</strong>, then restarts with subtitles once the copy is ready.</li>
+                        <li>Fast-forward and rewind become available again when the conversion finishes.</li>
+                        <li>One conversion runs at a time, and one subtitle language is embedded per copy. If the video's format can't be converted, PhimCa says so and plays it without subtitles.</li>
+                    </ul>
+                    <p>The converted copies live in the app's cache, so Android may reclaim that space when storage runs low; PhimCa simply re-creates the copy next time.</p>
+                </section>
+
+                <!-- 8 -->
+                <section class="card" id="s8">
+                    <h2><span class="num">8</span> Screen mirroring <span style="font-size:13px;font-weight:700;color:var(--gold);align-self:center">PREMIUM</span></h2>
+                    <p>Screen mirroring sends your Android screen and audio to a DLNA-enabled TV or projector. It's a <strong>Premium</strong> feature, reached from the <strong>More</strong> tab.</p>
+
+                    <h3>Privacy Mode (app pinning)</h3>
+                    <p>Ordinary screen mirroring leaks incoming messages, bank details and other sensitive notifications. PhimCa solves this with <strong>Privacy Mode</strong>, enabled by default:</p>
+                    <ul>
+                        <li><strong>App selection:</strong> before casting, you choose the specific app you intend to show.</li>
+                        <li><strong>Automatic pause:</strong> if you leave that app for the home screen or another app, PhimCa immediately freezes the cast image and shows a static <strong>"Privacy Pause"</strong> screen on the TV. Casting resumes automatically when you return.</li>
+                        <li><strong>Requirement:</strong> Privacy Mode needs the <strong>Usage Access</strong> (<code>PACKAGE_USAGE_STATS</code>) permission in Android Settings. PhimCa shows a prominent disclosure explaining this before sending you there.</li>
+                    </ul>
+
+                    <h3>Do Not Disturb integration</h3>
+                    <ul>
+                        <li>With <strong>Hide notifications while mirroring</strong> enabled in Settings, PhimCa puts your phone in Do Not Disturb for the duration of the mirror cast, so pop-up notifications can't interrupt your stream.</li>
+                        <li><strong>Requirement:</strong> the <strong>Do Not Disturb Access</strong> (<code>ACCESS_NOTIFICATION_POLICY</code>) permission. If it isn't granted, PhimCa's settings show a warning with a quick setup link.</li>
+                    </ul>
+
+                    <h3>DRM protection (FLAG_SECURE)</h3>
+                    <p>DRM-protected apps — Netflix, Amazon Prime, banking apps — block screen recording. Mirroring them produces a black screen on the TV. This is an Android platform security constraint and is normal behaviour.</p>
+                </section>
+
+                <!-- 9 -->
+                <section class="card" id="s9">
+                    <h2><span class="num">9</span> Managing cloud downloads</h2>
+                    <p>When you cast from a cloud drive such as Google Drive, providers expire their temporary links — which can break playback mid-album or partway through a long queue.</p>
+                    <p>To avoid that, PhimCa downloads a durable copy of the cloud track to internal storage when playback starts.</p>
+                    <ul>
+                        <li><strong>Space management:</strong> <strong>Settings → Cloud Downloads</strong> shows the total space these files occupy.</li>
+                        <li><strong>Clear cache:</strong> tap <strong>Clear Cloud Downloads</strong> to free the space immediately.</li>
+                        <li><strong>Storage limit:</strong> set a budget (1 GB, 5 GB, 10 GB…) via <strong>Cloud storage limit</strong>. When the cache exceeds it, PhimCa evicts the least recently played files first. Files belonging to a saved playlist are protected from this cleanup.</li>
+                    </ul>
+                    <p>Files on an SD card are read in place and are never copied.</p>
+                </section>
+
+                <!-- 10 -->
+                <section class="card" id="s10">
+                    <h2><span class="num">10</span> Battery optimization</h2>
+                    <p>Android's aggressive battery saving (Doze and OEM App Standby) can freeze background apps when the screen goes off, which stalls a casting queue or stops it advancing.</p>
+                    <p>To prevent background stalls:</p>
+                    <ol>
+                        <li>Go to <strong>Settings → Casting</strong>.</li>
+                        <li>Tap <strong>Background playback</strong> (or the info button beside it).</li>
+                        <li>PhimCa sends you to Android's battery optimization settings.</li>
+                        <li>Set PhimCa's battery usage to <strong>Unrestricted</strong> (or "Don't optimize").</li>
+                        <li>The switch in PhimCa's settings turns <strong>ON</strong> once the system registers the change.</li>
+                    </ol>
+                    <p>Leaving <strong>Gapless casting</strong> on (the default) also helps here: the renderer already holds the next track, so the queue keeps moving even if Android freezes the app.</p>
+                </section>
+
+                <!-- 11 -->
+                <section class="card" id="s11">
+                    <h2><span class="num">11</span> Free tier and Premium</h2>
+                    <p><strong>Playing media on your phone is completely free and unlimited</strong> — no track limit, every audio format, every quality tier.</p>
+                    <p><strong>Casting is also free</strong>, supported by ads, with one limit: on the free tier a single casting run covers <strong>16 tracks</strong>. When a run reaches the end, PhimCa tells you why it stopped rather than going quiet. This is a limit on how far one run plays unattended — <em>not</em> on which tracks you may cast. Every track in your queue remains playable: tap any row and casting continues from there.</p>
+                    <p><strong>Screen mirroring is Premium-only.</strong></p>
+                    <p><strong>Premium</strong> is a <strong>one-time purchase</strong> — not a subscription. It removes all ads, lifts the casting-run limit, and unlocks screen mirroring. If you reinstall the app or move to a new phone, use <strong>Restore purchases</strong> in Settings.</p>
+
+                    <h3>Privacy</h3>
+                    <p>PhimCa has no account to create and no login. Your media never leaves your network: SMB, DLNA and local playback are all LAN-only traffic between your phone, your server and your TV. The only off-device connections the app makes are the purchase/entitlement check and, on the free tier, ad serving and its consent prompt. Premium removes the ad connections.</p>
+                    <p>PhimCa is available in 15 languages, selectable under <strong>Settings → Language</strong>.</p>
+                </section>
+
+                <!-- 12 -->
+                <section class="card" id="s12">
+                    <h2><span class="num">12</span> Troubleshooting &amp; FAQs</h2>
+
+                    <details class="faq">
+                        <summary>Why are my DLNA devices not showing up in the Cast list?</summary>
+                        <div class="faq-body"><p>Check that your phone and your rendering devices are on the exact same Wi-Fi network and band (both on 2.4 GHz, or both on 5 GHz). Make sure AP Isolation or Guest Mode is disabled on your router. Tapping the cast button again triggers a fresh SSDP/mDNS discovery scan.</p></div>
+                    </details>
+
+                    <details class="faq">
+                        <summary>My NAS doesn't appear in the device list.</summary>
+                        <div class="faq-body"><p>PhimCa lists a server only if it answers on an SMB port (445 or 139) <em>and</em> offers at least one browsable share — that's what keeps routers and printers out of the list. Check that file sharing is switched on and that the NAS has <strong>SMB2 or SMB3</strong> enabled; the Google Play build doesn't support SMB1. If it still doesn't appear, add it manually by IP address from the Media Sources sheet.</p></div>
+                    </details>
+
+                    <details class="faq">
+                        <summary>Why is my DSF/DSD music playing as loud static noise?</summary>
+                        <div class="faq-body"><p>This happens when your AV receiver or network DAC treats the PCM stream as raw data, or can't determine the sample format. Make sure your receiver supports <strong>LPCM 192 kHz 16-bit</strong>, and check that it understands the <code>DLNA.ORG_PN=LPCM</code> protocol tag — PhimCa sends it by default precisely to select the correct LPCM decoder.</p></div>
+                    </details>
+
+                    <details class="faq">
+                        <summary>Why don't my subtitles show up on the TV?</summary>
+                        <div class="faq-body">
+                            <p>First make sure the subtitle file sits in the same folder as the video on your share with the same base name (e.g. <code>MyVideo.mp4</code> and <code>MyVideo.srt</code>), or pick it manually with <strong>Select Subtitles</strong>.</p>
+                            <p>Some DLNA TVs and projectors don't support external subtitle files at all, or only support SRT. If PhimCa recognises your device as one of those, it will offer to <a href="#s7">embed the subtitles into a copy of the video</a> instead.</p>
+                        </div>
+                    </details>
+
+                    <details class="faq">
+                        <summary>Why does playback stall or skip when I lock my phone screen?</summary>
+                        <div class="faq-body"><p>Android is freezing the background media process to save battery. Follow <a href="#s10">section 10</a> to set PhimCa's battery profile to <strong>Unrestricted</strong>, and leave <strong>Gapless casting</strong> enabled.</p></div>
+                    </details>
+
+                    <details class="faq">
+                        <summary>My music stopped after a notification sound or a phone call.</summary>
+                        <div class="faq-body"><p>PhimCa releases audio to the system for calls and alerts and resumes on its own afterwards. If it doesn't, tap play in the <strong>Playing</strong> tab or on your lock screen.</p></div>
+                    </details>
+
+                    <details class="faq">
+                        <summary>Cover art disappeared from some tracks.</summary>
+                        <div class="faq-body"><p>On Android 13 and newer, check that PhimCa still has permission to read <strong>images</strong> — album art on local folders depends on it. Then run <strong>Settings → Scan device library</strong> to refresh the index.</p></div>
+                    </details>
+
+                    <details class="faq">
+                        <summary>A song I deleted still shows in Albums.</summary>
+                        <div class="faq-body"><p>The library index refreshes on scan. Run <strong>Settings → Scan device library</strong> and the removed files will disappear.</p></div>
+                    </details>
+
+                    <details class="faq">
+                        <summary>What are the limits of the free tier?</summary>
+                        <div class="faq-body"><p>Playback on your phone is completely free and unlimited. Casting is free and ad-supported, with free-tier casting runs covering 16 tracks at a time — you can always tap another row to keep going. Screen mirroring is Premium-only. A one-time Premium purchase removes all ads, lifts the casting-run limit, and unlocks screen mirroring.</p></div>
+                    </details>
+                </section>
+
+                <div class="cta">
+                    <h2>Ready to cast?</h2>
+                    <p>PhimCa is free to try — local playback is unlimited, and casting works out of the box.</p>
+                    <a href="https://play.google.com/store/apps/details?id=com.phimca.app" class="btn btn-gold play-badge" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="#3a2a00" aria-hidden="true"><path d="M3.6 2.3c-.3.3-.5.7-.5 1.3v16.8c0 .6.2 1 .5 1.3l.1.1L13 12.1v-.2L3.7 2.2l-.1.1z"/><path d="M16.3 15.4l-3.3-3.3v-.2l3.3-3.3.1.1 3.9 2.2c1.1.6 1.1 1.7 0 2.4l-4 2.1z"/><path d="M16.4 15.3L13 12 3.6 21.7c.4.4 1 .4 1.7 0l11.1-6.4z"/><path d="M16.4 8.7L5.3 2.3c-.7-.4-1.3-.4-1.7 0L13 12l3.4-3.3z"/></svg>
+                        <span class="pb-txt"><small>Get it on</small><strong>Google Play</strong></span>
+                    </a>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <footer>
+        <div class="wrap foot-inner">
+            <a class="brand" href="/">
+                <img class="mark" src="../logo.png" alt="PhimCa app icon" width="36" height="36">
+                <span class="name">PhimCa</span>
+            </a>
+            <div class="foot-links">
+                <a href="/">Home</a>
+                <a href="/manual/vi/" hreflang="vi">Tiếng Việt</a>
+                <a href="https://vietace.github.io/phimca-privacy/" target="_blank" rel="noopener">Privacy Policy</a>
+                <a href="https://play.google.com/store/apps/details?id=com.phimca.app" target="_blank" rel="noopener">Google Play</a>
+                <a class="js-email" href="#contact">Contact support</a>
+            </div>
+        </div>
+        <div class="wrap"><p class="foot-meta">&copy; 2026 PhimCa &middot; com.phimca.app &middot; User manual for app version 3.8.2 &middot; Support: <a class="js-email" href="#contact" style="color:inherit">contact us</a></p></div>
+    </footer>
+
+    <script>
+    (function () {
+        // ---- mobile contents toggle ----
+        var toggle = document.querySelector('.toc-toggle');
+        var list = document.getElementById('toclist');
+        if (toggle && list) {
+            toggle.addEventListener('click', function () {
+                var open = list.classList.toggle('open');
+                toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            });
+            list.addEventListener('click', function (e) {
+                if (e.target.tagName === 'A' && window.matchMedia('(max-width: 940px)').matches) {
+                    list.classList.remove('open');
+                    toggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+
+        // ---- highlight the section currently in view ----
+        var links = Array.prototype.slice.call(document.querySelectorAll('#toclist a'));
+        var byId = {};
+        links.forEach(function (a) { byId[a.getAttribute('href').slice(1)] = a; });
+        var sections = Array.prototype.slice.call(document.querySelectorAll('section.card[id]'));
+
+        if ('IntersectionObserver' in window) {
+            var visible = {};
+            var obs = new IntersectionObserver(function (entries) {
+                entries.forEach(function (en) { visible[en.target.id] = en.isIntersecting; });
+                var current = null;
+                for (var i = 0; i < sections.length; i++) {
+                    if (visible[sections[i].id]) { current = sections[i].id; break; }
+                }
+                links.forEach(function (a) { a.classList.remove('active'); });
+                if (current && byId[current]) byId[current].classList.add('active');
+            }, { rootMargin: '-84px 0px -65% 0px', threshold: 0 });
+            sections.forEach(function (s) { obs.observe(s); });
+        }
+
+        // ---- support address assembled at runtime (keeps it out of the static HTML,
+        //      same recipe as the homepage: bots don't run JS, humans still see it) ----
+        var user = 'epicmediadev', domain = 'gmail.com', addr = user + '@' + domain;
+        Array.prototype.forEach.call(document.querySelectorAll('a.js-email'), function (a) {
+            a.setAttribute('href', 'mailto:' + addr);
+            a.textContent = addr;
+        });
+    })();
+    </script>
+</body>
+</html>
